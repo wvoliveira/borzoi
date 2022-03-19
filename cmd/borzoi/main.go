@@ -3,11 +3,13 @@ package main
 import (
 	"context"
 	"embed"
+	"flag"
 	"fmt"
 	"github.com/elga-io/borzoi/internal/app/auth"
 	"github.com/elga-io/borzoi/internal/app/auth/password"
 	"github.com/elga-io/borzoi/internal/app/user"
 	"github.com/elga-io/borzoi/internal/pkg/config"
+	"github.com/elga-io/borzoi/internal/pkg/entity"
 	"github.com/elga-io/canideos/database"
 	"github.com/gorilla/mux"
 	"io/fs"
@@ -28,6 +30,8 @@ import (
 var nextFS embed.FS
 
 func main() {
+	flag.Parse()
+
 	// Create context that listens for the interrupt signal from the OS.
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
@@ -40,6 +44,13 @@ func main() {
 	cfg := config.NewConfig()
 	db := database.NewSQLDatabase("sqlite", "./.db/data")
 	cache := database.NewNoSQLDatabase("badger", "./.db/cache")
+
+	if *fMigrate {
+		err = db.AutoMigrate(entity.Identity{}, entity.User{})
+		if err != nil {
+			log.Fatal(fmt.Sprintf("%s error: in indetities migration: %s\n", time.Now(), err.Error()))
+		}
+	}
 
 	router := mux.NewRouter().SkipClean(true)
 	router.Use(middlewareLog)

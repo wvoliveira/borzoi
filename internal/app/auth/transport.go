@@ -10,7 +10,7 @@ import (
 
 func (s service) HTTPNew(r *mux.Router) {
 	// TODO add middlewares to check authentication and authorization.
-	rr := r.PathPrefix("/auth").Subrouter()
+	rr := r.PathPrefix("/v1/auth").Subrouter()
 
 	rr.HandleFunc("/logout", s.HTTPLogout).Methods("GET")
 }

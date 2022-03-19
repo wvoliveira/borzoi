@@ -50,7 +50,8 @@ func (s service) FindByID(id string) (user entity.User, err error) {
 func (s service) Update(id string, payload entity.User) (user entity.User, err error) {
 	fmt.Printf("%s info: updating user with id '%s'\n", time.Now(), id)
 
-	payload.UpdatedAt = time.Now()
+	now := time.Now()
+	payload.UpdatedAt = &now
 
 	err = s.db.Model(&entity.User{}).Where("id = ?", id).Updates(&payload).Error
 	if err == gorm.ErrRecordNotFound {

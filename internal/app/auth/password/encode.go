@@ -12,15 +12,15 @@ type response struct {
 }
 
 func encodeLogin(w http.ResponseWriter, token string) (err error) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
 	cookie := &http.Cookie{
-		Name:   "session",
-		Value:  token,
-		MaxAge: 300,
+		Name:     "session",
+		Value:    token,
+		HttpOnly: false,
 	}
 	http.SetCookie(w, cookie)
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
+
 	err = json.NewEncoder(w).Encode(response{
 		Status: "successful",
 	})

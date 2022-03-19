@@ -78,7 +78,7 @@ func (s service) Login(_ context.Context, identity entity.Identity) (token strin
 	}
 
 	token = uuid.New().String()
-	key := fmt.Sprintf("auth/tokens/%s", token)
+	key := fmt.Sprintf("users/%s/tokens/%s", user.ID, token)
 
 	err = s.cache.Update(func(txn *badger.Txn) (err error) {
 		data, err := json.Marshal(user)
@@ -95,6 +95,17 @@ func (s service) Login(_ context.Context, identity entity.Identity) (token strin
 
 // Register a new user to our database.
 func (s service) Register(_ context.Context, identity entity.Identity) (err error) {
+	// Check if identity exists.
+	identityDB := entity.Identity{}
+	err = s.db.Model(&entity.Identity{}).Where("provider = ? AND uid = ?", identity.Provider, identity.UID).First(&identityDB).Error
+
+	if identityDB.ID != "" {
+		fmt.Printf("%s debug: provider %s and uid %s already exists\n", time.Now(), identity.Provider, identity.UID)
+		return errors.New("this email already exists in our database")
+	} else if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		fmt.Printf("%s error: unkown error: %s\n", time.Now(), err.Error())
+		return errors.New("sorry, internal error happens")
+	}
 
 	user := entity.User{}
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(identity.Password), 8)
