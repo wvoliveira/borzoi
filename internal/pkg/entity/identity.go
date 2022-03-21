@@ -14,5 +14,5 @@ type Identity struct {
 	UserID   string `json:"user_id"`
 
 	Verified   *bool      `json:"verified" gorm:"default:false"`
-	VerifiedAt *time.Time `json:"confirmed_at"`
+	VerifiedAt *time.Time `json:"verified_at"`
 }
