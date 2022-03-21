@@ -8,8 +8,10 @@ import (
 	"github.com/dgraph-io/badger/v3"
 	"github.com/elga-io/borzoi/internal/pkg/constant"
 	"github.com/elga-io/borzoi/internal/pkg/entity"
+	e "github.com/elga-io/canideos/errors"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
+	"github.com/rs/zerolog/log"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"net/http"
@@ -48,22 +50,24 @@ func NewService(db *gorm.DB, cache *badger.DB) Service {
 
 // Login authenticates a user and generates a JWT token if authentication succeeds.
 // Otherwise, an error is returned.
-func (s service) Login(_ context.Context, identity entity.Identity) (token string, err error) {
+func (s service) Login(ctx context.Context, identity entity.Identity) (token string, err error) {
+	l := log.Ctx(ctx)
+
 	// Check if identity exists.
 	identityDB := entity.Identity{}
 	err = s.db.Model(&entity.Identity{}).Where("provider = ? AND uid = ?", identity.Provider, identity.UID).First(&identityDB).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		fmt.Printf("%s warn: this provider + uid was not found in database: %s", time.Now(), err.Error())
-		return token, errors.New("sorry, you are not authorized")
+		l.Warn().Caller().Msg(fmt.Sprintf("this provider + uid was not found in database: %s", err.Error()))
+		return token, e.ErrAuthUnauthorized
 	} else if err != nil {
-		fmt.Printf("%s error: error when get identity from database: %s", time.Now(), err.Error())
-		return token, errors.New("sorry, you are not authorized")
+		l.Error().Caller().Msg(fmt.Sprintf("when get identity from database: %s", err.Error()))
+		return token, e.ErrInternalServerError
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(identityDB.Password), []byte(identity.Password)); err != nil {
-		fmt.Printf("%s warn: login failed. Password from payload doesnt match password from database", time.Now())
-		return token, errors.New("sorry, you are not authorized")
+		l.Warn().Caller().Msg(e.ErrAuthPasswordDoesntMatch.Error())
+		return token, e.ErrAuthUnauthorized
 	}
 
 	// Get user info.
@@ -71,9 +75,11 @@ func (s service) Login(_ context.Context, identity entity.Identity) (token strin
 	err = s.db.Model(&entity.User{}).Where("id = ?", identityDB.UserID).First(&user).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return token, err
+		l.Warn().Caller().Msg(fmt.Sprintf("user_id %s was not found", identityDB.UserID))
+		return token, e.ErrUserNotFound
 	} else if err != nil {
-		return token, err
+		l.Error().Caller().Msg(err.Error())
+		return token, e.ErrInternalServerError
 	}
 
 	token = uuid.New().String()
@@ -82,34 +88,37 @@ func (s service) Login(_ context.Context, identity entity.Identity) (token strin
 	err = s.cache.Update(func(txn *badger.Txn) (err error) {
 		data, err := json.Marshal(user)
 		if err != nil {
+			l.Error().Caller().Msg(err.Error())
 			return
 		}
 
-		e := badger.NewEntry([]byte(key), data).WithTTL(time.Hour * 12)
-		err = txn.SetEntry(e)
+		ee := badger.NewEntry([]byte(key), data).WithTTL(time.Hour * 12)
+		err = txn.SetEntry(ee)
 		return
 	})
 	return
 }
 
 // Register a new user to our database.
-func (s service) Register(_ context.Context, identity entity.Identity) (err error) {
+func (s service) Register(ctx context.Context, identity entity.Identity) (err error) {
+	l := log.Ctx(ctx)
+
 	// Check if identity exists.
 	identityDB := entity.Identity{}
 	err = s.db.Model(&entity.Identity{}).Where("provider = ? AND uid = ?", identity.Provider, identity.UID).First(&identityDB).Error
 
 	if identityDB.ID != "" {
-		fmt.Printf("%s debug: provider %s and uid %s already exists\n", time.Now(), identity.Provider, identity.UID)
-		return errors.New("this email already exists in our database")
+		l.Info().Caller().Msg(fmt.Sprintf("provider %s and uid %s already exists", identity.Provider, identity.UID))
+		return e.ErrAlreadyExists
 	} else if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		fmt.Printf("%s error: unkown error: %s\n", time.Now(), err.Error())
-		return errors.New("sorry, internal error happens")
+		l.Error().Caller().Msg(err.Error())
+		return e.ErrInternalServerError
 	}
 
 	user := entity.User{}
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(identity.Password), 8)
 	if err != nil {
-		fmt.Printf("%s err: when creating a hashed password: %s\n", time.Now(), err.Error())
+		l.Error().Caller().Msg(fmt.Sprintf("when creating a hashed password: %s", err.Error()))
 		return errors.New(fmt.Sprintf("internal server error: %s", err.Error()))
 	}
 

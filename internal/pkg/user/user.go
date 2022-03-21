@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/dgraph-io/badger/v3"
 	"github.com/elga-io/borzoi/internal/pkg/entity"
-	"time"
+	zl "github.com/rs/zerolog/log"
 )
 
 // FromContext get user struct from context.
@@ -24,10 +24,10 @@ func GetUserBySession(db *badger.DB, key []byte) (user entity.User, err error) {
 		err = item.Value(func(val []byte) (err error) {
 			err = json.Unmarshal(val, &user)
 			if err != nil {
-				fmt.Printf("%s error: trying unmarshal user from badgerdb value - %s\n", time.Now(), err.Error())
+				zl.Error().Caller().Msg(fmt.Sprintf("trying unmarshal user from badgerdb value - %s", err.Error()))
 				return
 			}
-			fmt.Printf("%s debug: user id from badgerdb: %s\n", time.Now(), user.ID)
+			zl.Debug().Caller().Msg(fmt.Sprintf("user id from badgerdb: %s", user.ID))
 			return
 		})
 		return

@@ -16,15 +16,16 @@ var (
 
 	ErrFieldsRequired = errors.New("require more body fields for this request")
 
-	// Token errors.
-	ErrTokenInvalid = errors.New("invalid token")
+	// ErrTokenInvalid generic token errors.
+	ErrTokenInvalid  = errors.New("invalid token")
+	ErrTokenExpired  = errors.New("your token has been expired")
+	ErrTokenParse    = errors.New("there was an error in parsing token")
+	ErrTokenNotFound = errors.New("token authorization not found in header")
 
-	// ErrUnauthorized default authentication error.
-	ErrUnauthorized     = errors.New("sorry, you are not unauthorized")
-	ErrParseToken       = errors.New("there was an error in parsing token")
-	ErrTokenExpired     = errors.New("your token has been expired")
-	ErrNoTokenFound     = errors.New("token authorization not found in header")
-	ErrAuthHeaderFormat = errors.New("must provide Authorization header with format `Bearer {token}`")
+	// ErrAuthUnauthorized default authentication error.
+	ErrAuthUnauthorized        = errors.New("unauthorized")
+	ErrAuthHeaderFormat        = errors.New("must provide Authorization header with format `Bearer {token}`")
+	ErrAuthPasswordDoesntMatch = errors.New("login failed. Password from payload doesnt match password from database")
 
 	// ErrUserNotFound error when user not found in database.
 	ErrUserNotFound = errors.New("user not found")
@@ -80,7 +81,7 @@ func codeFrom(err error) int {
 		return http.StatusNotFound
 	case ErrInconsistentIDs, ErrAccountDeleteYourSelf, ErrLinkAlreadyExists, ErrAlreadyExists, ErrLinkInvalidDomain, ErrLinkInvalidKeyword, ErrLinkInvalidURL:
 		return http.StatusBadRequest
-	case ErrUnauthorized, ErrNoTokenFound, ErrParseToken, ErrTokenExpired:
+	case ErrAuthUnauthorized, ErrTokenNotFound, ErrTokenParse, ErrTokenExpired:
 		return http.StatusUnauthorized
 	default:
 		return http.StatusInternalServerError

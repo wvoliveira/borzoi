@@ -1,11 +1,12 @@
 package user
 
 import (
-	"errors"
 	"fmt"
 	"github.com/dgraph-io/badger/v3"
 	"github.com/elga-io/borzoi/internal/pkg/entity"
+	e "github.com/elga-io/canideos/errors"
 	"github.com/gorilla/mux"
+	zl "github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 	"net/http"
 	"time"
@@ -41,31 +42,31 @@ func (s service) FindByID(id string) (user entity.User, err error) {
 
 	err = s.db.Debug().Model(&user).Preload("Identities").Find(&user).Error
 	if err == gorm.ErrRecordNotFound {
-		msg := fmt.Sprintf("%s warn: the user with id '%s' was not found\n", time.Now(), id)
-		return user, errors.New(msg)
-	} else if err == nil {
+		zl.Warn().Caller().Msg(fmt.Sprintf("user with id '%s' was not found", id))
+		return user, e.ErrNotFound
+	}
+	if err != nil {
+		zl.Error().Caller().Msg(err.Error())
 		return
 	}
-	fmt.Printf("%s error: oh crap, an errors occurred: %s\n", time.Now(), err.Error())
 	return
 }
 
 // Update change specific user by ID.
 func (s service) Update(id string, payload entity.User) (user entity.User, err error) {
-	fmt.Printf("%s info: updating user with id '%s'\n", time.Now(), id)
-
 	t := time.Now()
 	payload.UpdatedAt = &t
 
 	err = s.db.Model(&entity.User{}).Where("id = ?", id).Updates(&payload).Error
 	if err == gorm.ErrRecordNotFound {
-		fmt.Printf("%s info: the user with id '%s' was not found", time.Now(), id)
-		msg := fmt.Sprintf("%s warn: the user with id '%s' was not found\n", time.Now(), id)
-		return user, errors.New(msg)
-	} else if err == nil {
-		user = payload
+		zl.Info().Caller().Msg(fmt.Sprintf("the user with id '%s' was not found", id))
+		return user, e.ErrUserNotFound
+	}
+
+	if err != nil {
+		zl.Error().Caller().Msg(err.Error())
 		return
 	}
-	fmt.Printf("%s error: oh crap, an errors occurred: %s", time.Now(), err.Error())
+	user = payload
 	return
 }

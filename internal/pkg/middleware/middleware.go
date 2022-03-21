@@ -11,7 +11,8 @@ import (
 	"github.com/elga-io/borzoi/internal/pkg/user"
 	e "github.com/elga-io/canideos/errors"
 	"github.com/google/uuid"
-	zl "github.com/rs/zerolog/log"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"net/http"
 	"time"
 )
@@ -37,7 +38,8 @@ func (w *LogResponseWriter) Write(body []byte) (int, error) {
 }
 
 type Middleware struct {
-	Cache *badger.DB
+	Cache  *badger.DB
+	Logger zerolog.Logger
 }
 
 // Auth checks if the client is authenticated
@@ -47,11 +49,11 @@ func (m Middleware) Auth(next http.Handler) http.Handler {
 		cookie, err := r.Cookie("session")
 		if err != nil {
 			if errors.Is(err, http.ErrNoCookie) {
-				zl.Warn().Caller().Str("id", id).Str("text", http.ErrNoCookie.Error()).Msg("service")
-				e.EncodeError(w, e.ErrUnauthorized)
+				log.Warn().Caller().Str("id", id).Str("text", http.ErrNoCookie.Error()).Msg("service")
+				e.EncodeError(w, e.ErrAuthUnauthorized)
 				return
 			}
-			zl.Error().Caller().Msg(fmt.Sprintf("to get session from cookie: %s", err.Error()))
+			log.Error().Caller().Msg(fmt.Sprintf("to get session from cookie: %s", err.Error()))
 			e.EncodeError(w, err)
 			return
 		}
@@ -64,7 +66,7 @@ func (m Middleware) Auth(next http.Handler) http.Handler {
 		}
 
 		if u.ID == "" {
-			e.EncodeError(w, e.ErrUnauthorized)
+			e.EncodeError(w, e.ErrAuthUnauthorized)
 			return
 		}
 
@@ -73,27 +75,38 @@ func (m Middleware) Auth(next http.Handler) http.Handler {
 	})
 }
 
-// UUID add unique ID for each request.
-func UUID(next http.Handler) http.Handler {
+// CorrelationID add unique ID for each request.
+func (m Middleware) CorrelationID(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		id := uuid.New().String()
-		ctx := context.WithValue(r.Context(), "id", id)
-		next.ServeHTTP(w, r.WithContext(ctx))
+		ctx := r.Context()
+		id := r.Header.Get("X-Correlation-Id")
+		if id == "" {
+			id = uuid.New().String()
+		}
+
+		ctx = context.WithValue(ctx, "correlation_id", id)
+		r = r.WithContext(ctx)
+
+		m.Logger.UpdateContext(func(c zerolog.Context) zerolog.Context {
+			return c.Str("correlation_id", id)
+		})
+		r = r.WithContext(m.Logger.WithContext(r.Context()))
+
+		w.Header().Set("X-Correlation-Id", id)
+		next.ServeHTTP(w, r)
 	})
 }
 
 // Log print request info to stdout.
-func Log(next http.Handler) http.Handler {
+func (m Middleware) Log(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := r.Context()
-		id := unique.GetUUID(ctx)
 		startTime := time.Now()
 		logRespWriter := NewLogResponseWriter(w)
 
-		zl.
+		l := log.Ctx(r.Context())
+		l.
 			Info().
 			Caller().
-			Str("id", id).
 			Str("remote_addr", r.RemoteAddr).
 			Str("method", r.Method).
 			Str("path", r.URL.Path).
@@ -101,10 +114,9 @@ func Log(next http.Handler) http.Handler {
 
 		next.ServeHTTP(logRespWriter, r)
 
-		zl.
+		l.
 			Info().
 			Caller().
-			Str("id", id).
 			Str("duration", time.Since(startTime).String()).
 			Int("status", logRespWriter.statusCode).
 			Msg("response")

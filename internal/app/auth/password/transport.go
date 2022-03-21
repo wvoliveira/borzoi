@@ -25,7 +25,7 @@ func (s service) HTTPLogin(w http.ResponseWriter, r *http.Request) {
 	identity := entity.Identity{Provider: "email", UID: dr.Email, Password: dr.Password}
 
 	// Business logic.
-	token, err := s.Login(nil, identity)
+	token, err := s.Login(r.Context(), identity)
 	if err != nil {
 		e.EncodeError(w, err)
 		return
@@ -49,7 +49,7 @@ func (s service) HTTPRegister(w http.ResponseWriter, r *http.Request) {
 	identity := entity.Identity{Provider: "email", UID: dr.Email, Password: dr.Password}
 
 	// Business logic.
-	err = s.Register(nil, identity)
+	err = s.Register(r.Context(), identity)
 	if err != nil {
 		e.EncodeError(w, err)
 		return

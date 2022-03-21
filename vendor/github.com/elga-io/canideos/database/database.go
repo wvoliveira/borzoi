@@ -6,28 +6,42 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 	"log"
+	"os"
+	"time"
 )
 
 // NewSQLDatabase create a gorm database object.
 // kind: type of database, like "sqlite", "mysql", "postgresql", etc.
 // dsn: dsn with user/password and all necessary for connect in database.
 func NewSQLDatabase(kind, dsn string) (db *gorm.DB) {
+	newLogger := logger.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
+		logger.Config{
+			SlowThreshold:             time.Second,   // Slow SQL threshold
+			LogLevel:                  logger.Silent, // Log level
+			IgnoreRecordNotFoundError: true,          // Ignore ErrRecordNotFound error for logger
+			Colorful:                  false,         // Disable color
+		},
+	)
+	cfg := gorm.Config{Logger: newLogger}
+
 	switch kind {
 	case "sqlite":
-		db, err := gorm.Open(sqlite.Open(dsn), &gorm.Config{})
+		db, err := gorm.Open(sqlite.Open(dsn), &cfg)
 		if err != nil {
 			panic("failed to connect in sqlite database")
 		}
 		return db
 	case "mysql":
-		db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+		db, err := gorm.Open(mysql.Open(dsn), &cfg)
 		if err != nil {
 			panic("failed to connect in mysql database")
 		}
 		return db
 	case "postgresql":
-		db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+		db, err := gorm.Open(postgres.Open(dsn), &cfg)
 		if err != nil {
 			panic("failed to connect in postgresql database")
 		}
