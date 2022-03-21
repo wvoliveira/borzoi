@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/dgraph-io/badger/v3"
+	"github.com/elga-io/borzoi/internal/pkg/constant"
 	"github.com/elga-io/borzoi/internal/pkg/entity"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
@@ -48,8 +49,6 @@ func NewService(db *gorm.DB, cache *badger.DB) Service {
 // Login authenticates a user and generates a JWT token if authentication succeeds.
 // Otherwise, an error is returned.
 func (s service) Login(_ context.Context, identity entity.Identity) (token string, err error) {
-	fmt.Printf("%s info: initializing login function with identity id %s\n", time.Now(), identity.ID)
-
 	// Check if identity exists.
 	identityDB := entity.Identity{}
 	err = s.db.Model(&entity.Identity{}).Where("provider = ? AND uid = ?", identity.Provider, identity.UID).First(&identityDB).Error
@@ -78,7 +77,7 @@ func (s service) Login(_ context.Context, identity entity.Identity) (token strin
 	}
 
 	token = uuid.New().String()
-	key := fmt.Sprintf("users/%s/tokens/%s", user.ID, token)
+	key := fmt.Sprintf(constant.KeySession, token)
 
 	err = s.cache.Update(func(txn *badger.Txn) (err error) {
 		data, err := json.Marshal(user)
@@ -86,7 +85,7 @@ func (s service) Login(_ context.Context, identity entity.Identity) (token strin
 			return
 		}
 
-		e := badger.NewEntry([]byte(key), []byte(data)).WithTTL(time.Hour * 12)
+		e := badger.NewEntry([]byte(key), data).WithTTL(time.Hour * 12)
 		err = txn.SetEntry(e)
 		return
 	})

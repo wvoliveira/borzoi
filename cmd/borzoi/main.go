@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"embed"
+	"errors"
 	"flag"
 	"fmt"
 	"github.com/elga-io/borzoi/internal/app/auth"
@@ -10,10 +11,12 @@ import (
 	"github.com/elga-io/borzoi/internal/app/user"
 	"github.com/elga-io/borzoi/internal/pkg/config"
 	"github.com/elga-io/borzoi/internal/pkg/entity"
+	l "github.com/elga-io/borzoi/internal/pkg/log"
+	"github.com/elga-io/borzoi/internal/pkg/middleware"
 	"github.com/elga-io/canideos/database"
 	"github.com/gorilla/mux"
+	zl "github.com/rs/zerolog/log"
 	"io/fs"
-	"log"
 	"net/http"
 	"os/signal"
 	"strings"
@@ -31,6 +34,8 @@ var nextFS embed.FS
 
 func main() {
 	flag.Parse()
+	l.New()
+	zl.Info().Msg("Initializing app...")
 
 	// Create context that listens for the interrupt signal from the OS.
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
@@ -38,7 +43,7 @@ func main() {
 
 	distFS, err := fs.Sub(nextFS, "web")
 	if err != nil {
-		log.Fatal(err)
+		zl.Fatal().Msg(err.Error())
 	}
 
 	cfg := config.NewConfig()
@@ -48,12 +53,13 @@ func main() {
 	if *fMigrate {
 		err = db.AutoMigrate(entity.Identity{}, entity.User{})
 		if err != nil {
-			log.Fatal(fmt.Sprintf("%s error: in indetities migration: %s\n", time.Now(), err.Error()))
+			zl.Fatal().Msg(fmt.Sprintf("in indetities migration: %s", err.Error()))
 		}
 	}
 
 	router := mux.NewRouter().SkipClean(true)
-	router.Use(middlewareLog)
+	router.Use(middleware.UUID)
+	router.Use(middleware.Log)
 
 	webRouter := router.MatcherFunc(func(req *http.Request, match *mux.RouteMatch) bool {
 		return req.RequestURI == "/" ||
@@ -75,7 +81,7 @@ func main() {
 	webHandler := http.FileServer(http.FS(distFS))
 	webRouter.PathPrefix("").Handler(webHandler)
 
-	printRoutes([]*mux.Router{apiRouter})
+	printRoutes([]*mux.Router{webRouter, apiRouter})
 
 	srv := &http.Server{
 		Addr:         ":" + cfg.HTTPPort,
@@ -87,9 +93,9 @@ func main() {
 	// Initializing the server in a goroutine so that
 	// it won't block the graceful shutdown handling below
 	go func() {
-		fmt.Printf("started server on :%[1]s, url: http://localhost:%[1]s\n", cfg.HTTPPort)
+		zl.Info().Msg(fmt.Sprintf("started server on :%[1]s, url: http://localhost:%[1]s", cfg.HTTPPort))
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			fmt.Printf("listen: %s\n\n", err.Error())
+			zl.Error().Msg(fmt.Sprintf("listen: %s", err.Error()))
 		}
 	}()
 
@@ -98,36 +104,36 @@ func main() {
 
 	// Restore default behavior on the interrupt signal and notify user of shutdown.
 	stop()
-	fmt.Println("shutting down gracefully, press Ctrl+C again to force")
+	zl.Info().Msg("shutting down gracefully. Press ctrl+c again to force")
 
 	// The context is used to inform the server it has 5 seconds to finish
 	// the request it is currently handling
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := srv.Shutdown(ctx); err != nil {
-		fmt.Printf("Server forced to shutdown: %s\n\n", err.Error())
+		zl.Error().Msg(fmt.Sprintf("server forced to shutdown: %s", err.Error()))
 	}
-	fmt.Println("Server exiting")
-}
-
-func middlewareLog(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// TODO: get status code from http.ResponseWriter
-		log.Printf("%s %s %s\n", r.RemoteAddr, r.Method, r.URL)
-		next.ServeHTTP(w, r)
-	})
+	zl.Info().Msg("server exiting")
 }
 
 func printRoutes(rs []*mux.Router) {
 	for _, r := range rs {
 		_ = r.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
-			t, err := route.GetPathTemplate()
+			uri, err := route.GetPathTemplate()
 			if err != nil {
-				fmt.Println(err.Error())
+				zl.Error().Msg(fmt.Sprintf("with get path template: %s", err.Error()))
 				return err
 			}
-			if t != "" {
-				fmt.Println(t)
+
+			method, err := route.GetMethods()
+			if err != nil {
+				if errors.Is(err, mux.ErrMethodMismatch) {
+					return err
+				}
+			}
+
+			if uri != "" && len(method) != 0 {
+				fmt.Printf("%s %s\n", uri, method)
 			}
 			return nil
 		})

@@ -17,8 +17,12 @@ type Service interface {
 	Update(id string, payload entity.User) (link entity.User, err error)
 
 	HTTPNew(r *mux.Router)
+	HTTPFindAll(w http.ResponseWriter, r *http.Request)
 	HTTPFindByID(w http.ResponseWriter, r *http.Request)
 	HTTPUpdate(w http.ResponseWriter, r *http.Request)
+
+	HTTPFindMe(w http.ResponseWriter, r *http.Request)
+	HTTPUpdateMe(w http.ResponseWriter, r *http.Request)
 }
 
 type service struct {

@@ -13,9 +13,9 @@ type response struct {
 
 func encodeLogin(w http.ResponseWriter, token string) (err error) {
 	cookie := &http.Cookie{
-		Name:     "session",
-		Value:    token,
-		HttpOnly: false,
+		Name:  "session",
+		Value: token,
+		Path:  "/",
 	}
 	http.SetCookie(w, cookie)
 	w.Header().Set("Content-Type", "application/json")
