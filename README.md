@@ -1,206 +1,146 @@
-# Standard Go Project Layout
+#<img src="https://user-images.githubusercontent.com/<id>.svg" width="240"/>
 
-Translations:
+[![Latest GitHub release](https://img.shields.io/github/v/release/elga-io/borzoi?color=25ae8f)](https://github.com/dstotijn/borzoi/releases/latest)
+[![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Fdstotijn%2Fborzoi%2Fbadge%3Fref%3Dmain&label=build&color=24ae8f)](https://github.com/dstotijn/borzoi/actions/workflows/build-test.yml)
+![GitHub download count](https://img.shields.io/github/downloads/dstotijn/borzoi/total?color=25ae8f)
+[![GitHub](https://img.shields.io/github/license/dstotijn/borzoi?color=25ae8f)](https://github.com/dstotijn/borzoi/blob/master/LICENSE)
+[![Documentation](https://img.shields.io/badge/borzoi-docs-25ae8f)](https://borzoi.xyz/)
 
-* [한국어 문서](README_ko.md)
-* [简体中文](README_zh.md)
-* [正體中文](README_zh-TW.md)
-* [简体中文](README_zh-CN.md) - ???
-* [Français](README_fr.md)
-* [日本語](README_ja.md)
-* [Portuguese](README_ptBR.md)
-* [Español](README_es.md)
-* [Română](README_ro.md)
-* [Русский](README_ru.md)
-* [Türkçe](README_tr.md)
+* [Portuguese](README_pt-br.md)
 
-## Overview
+**Borzoi** is a shortener app. It aims to become an open
+source alternative to commercial software like Bitly, with simple features.
 
-This is a basic layout for Go application projects. It's **`not an official standard defined by the core Go dev team`**; however, it is a set of common historical and emerging project layout patterns in the Go ecosystem. Some of these patterns are more popular than others. It also has a number of small enhancements along with several supporting directories common to any large enough real world application.
+<img src="https://borzoi.xyz/img/hero.png" width="907" alt="Borzoi (screenshot)" />
 
-**`If you are trying to learn Go or if you are building a PoC or a simple project for yourself this project layout is an overkill. Start with something really simple instead (a single `main.go` file and `go.mod` is more than enough).`** As your project grows keep in mind that it'll be important to make sure your code is well structured otherwise you'll end up with a messy code with lots of hidden dependencies and global state. When you have more people working on the project you'll need even more structure. That's when it's important to introduce a common way to manage packages/libraries. When you have an open source project or when you know other projects import the code from your project repository that's when it's important to have private (aka `internal`) packages and code. Clone the repository, keep what you need and delete everything else! Just because it's there it doesn't mean you have to use it all. None of these patterns are used in every single project. Even the `vendor` pattern is not universal.
+## Features
 
-With Go 1.14 [`Go Modules`](https://github.com/golang/go/wiki/Modules) are finally ready for production. Use [`Go Modules`](https://blog.golang.org/using-go-modules) unless you have a specific reason not to use them and if you do then you don’t need to worry about $GOPATH and where you put your project. The basic `go.mod` file in the repo assumes your project is hosted on GitHub, but it's not a requirement. The module path can be anything though the first module path component should have a dot in its name (the current version of Go doesn't enforce it anymore, but if you are using slightly older versions don't be surprised if your builds fail without it). See Issues [`37554`](https://github.com/golang/go/issues/37554) and [`32819`](https://github.com/golang/go/issues/32819) if you want to know more about it.
+- Machine-in-the-middle (MITM) HTTP proxy, with logs and advanced search
+- HTTP client for manually creating/editing requests, and replay proxied requests
+- Scope support, to help keep work organized
+- Easy-to-use web based admin interface
+- Project based database storage, to help keep work organized
 
-This project layout is intentionally generic and it doesn't try to impose a specific Go package structure.
+👷‍♂️ Borzoi is under active development. Check the <a
+href="https://github.com/dstotijn/borzoi/projects/1">backlog</a> for the current
+status.
 
-This is a community effort. Open an issue if you see a new pattern or if you think one of the existing patterns needs to be updated.
+📣 Are you pen testing professionaly in a team? I would love to hear your
+thoughts on tooling via [this 5 minute
+survey](https://forms.gle/36jtgNc3TJ2imi5A8). Thank you!
 
-If you need help with naming, formatting and style start by running [`gofmt`](https://golang.org/cmd/gofmt/) and [`golint`](https://github.com/golang/lint). Also make sure to read these Go code style guidelines and recommendations:
-* https://talks.golang.org/2014/names.slide
-* https://golang.org/doc/effective_go.html#names
-* https://blog.golang.org/package-names
-* https://github.com/golang/go/wiki/CodeReviewComments
-* [Style guideline for Go packages](https://rakyll.org/style-packages) (rakyll/JBD)
+## Getting started
 
-See [`Go Project Layout`](https://medium.com/golang-learn/go-project-layout-e5213cdcfaa2) for additional background information.
+💡 The [Getting started](https://borzoi.xyz/docs/getting-started) doc has more
+detailed install and usage instructions.
 
-More about naming and organizing packages as well as other code structure recommendations:
-* [GopherCon EU 2018: Peter Bourgon - Best Practices for Industrial Programming](https://www.youtube.com/watch?v=PTE4VJIdHPg)
-* [GopherCon Russia 2018: Ashley McNamara + Brian Ketelsen - Go best practices.](https://www.youtube.com/watch?v=MzTcsI6tn-0)
-* [GopherCon 2017: Edward Muller - Go Anti-Patterns](https://www.youtube.com/watch?v=ltqV6pDKZD8)
-* [GopherCon 2018: Kat Zien - How Do You Structure Your Go Apps](https://www.youtube.com/watch?v=oL6JBUk6tj0)
+### Installation
 
-A Chinese Post about Package-Oriented-Design guidelines and Architecture layer
-* [面向包的设计和架构分层](https://github.com/danceyoung/paper-code/blob/master/package-oriented-design/packageorienteddesign.md)
+The quickest way to install and update Borzoi is via a package manager:
 
-## Go Directories
+#### macOS
 
-### `/cmd`
+```sh
+brew install borzoisoft/tap/borzoi
+```
 
-Main applications for this project.
+#### Linux
 
-The directory name for each application should match the name of the executable you want to have (e.g., `/cmd/myapp`).
+```sh
+sudo snap install borzoi
+```
 
-Don't put a lot of code in the application directory. If you think the code can be imported and used in other projects, then it should live in the `/pkg` directory. If the code is not reusable or if you don't want others to reuse it, put that code in the `/internal` directory. You'll be surprised what others will do, so be explicit about your intentions!
+#### Windows
 
-It's common to have a small `main` function that imports and invokes the code from the `/internal` and `/pkg` directories and nothing else.
+```sh
+scoop bucket add borzoisoft https://github.com/borzoisoft/scoop-bucket.git
+scoop install borzoisoft/borzoi
+```
 
-See the [`/cmd`](cmd/README.md) directory for examples.
+#### Other
 
-### `/internal`
+Alternatively, you can [download the latest release from
+GitHub](https://github.com/dstotijn/borzoi/releases/latest) for your OS and
+architecture, and move the binary to a directory in your `$PATH`. If your OS is
+not available for one of the package managers or not listed in the GitHub
+releases, you can compile from source _(link coming soon)_ or use a Docker image
+_(link coming soon)_.
 
-Private application and library code. This is the code you don't want others importing in their applications or libraries. Note that this layout pattern is enforced by the Go compiler itself. See the Go 1.4 [`release notes`](https://golang.org/doc/go1.4#internalpackages) for more details. Note that you are not limited to the top level `internal` directory. You can have more than one `internal` directory at any level of your project tree.
+### Usage
 
-You can optionally add a bit of extra structure to your internal packages to separate your shared and non-shared internal code. It's not required (especially for smaller projects), but it's nice to have visual clues showing the intended package use. Your actual application code can go in the `/internal/app` directory (e.g., `/internal/app/myapp`) and the code shared by those apps in the `/internal/pkg` directory (e.g., `/internal/pkg/myprivlib`).
+Once installed, start Borzoi via:
 
-### `/pkg`
+```sh
+borzoi
+```
 
-Library code that's ok to use by external applications (e.g., `/pkg/mypubliclib`). Other projects will import these libraries expecting them to work, so think twice before you put something here :-) Note that the `internal` directory is a better way to ensure your private packages are not importable because it's enforced by Go. The `/pkg` directory is still a good way to explicitly communicate that the code in that directory is safe for use by others. The [`I'll take pkg over internal`](https://travisjeffery.com/b/2019/11/i-ll-take-pkg-over-internal/) blog post by Travis Jeffery provides a good overview of the `pkg` and `internal` directories and when it might make sense to use them.
+💡 Read the [Getting started](https://borzoi.xyz/docs/getting-started) doc for
+more details.
 
-It's also a way to group Go code in one place when your root directory contains lots of non-Go components and directories making it easier to run various Go tools (as mentioned in these talks: [`Best Practices for Industrial Programming`](https://www.youtube.com/watch?v=PTE4VJIdHPg) from GopherCon EU 2018, [GopherCon 2018: Kat Zien - How Do You Structure Your Go Apps](https://www.youtube.com/watch?v=oL6JBUk6tj0) and [GoLab 2018 - Massimiliano Pippi - Project layout patterns in Go](https://www.youtube.com/watch?v=3gQa1LWwuzk)).
+To list all available options, run: `borzoi --help`:
 
-See the [`/pkg`](pkg/README.md) directory if you want to see which popular Go repos use this project layout pattern. This is a common layout pattern, but it's not universally accepted and some in the Go community don't recommend it.
+```
+$ borzoi --help
 
-It's ok not to use it if your app project is really small and where an extra level of nesting doesn't add much value (unless you really want to :-)). Think about it when it's getting big enough and your root directory gets pretty busy (especially if you have a lot of non-Go app components).
+Usage:
+    borzoi [flags] [subcommand] [flags]
 
-The `pkg` directory origins: The old Go source code used to use `pkg` for its packages and then various Go projects in the community started copying the pattern (see [`this`](https://twitter.com/bradfitz/status/1039512487538970624) Brad Fitzpatrick's tweet for more context).
+Runs an HTTP server with (MITM) proxy, GraphQL service, and a web based admin interface.
 
-### `/vendor`
+Options:
+    --cert         Path to root CA certificate. Creates file if it doesn't exist. (Default: "~/.borzoi/borzoi_cert.pem")
+    --key          Path to root CA private key. Creates file if it doesn't exist. (Default: "~/.borzoi/borzoi_key.pem")
+    --db           Database directory path. (Default: "~/.borzoi/db")
+    --addr         TCP address for HTTP server to listen on, in the form \"host:port\". (Default: ":8080")
+    --chrome       Launch Chrome with proxy settings applied and certificate errors ignored. (Default: false)
+    --verbose      Enable verbose logging.
+    --json         Encode logs as JSON, instead of pretty/human readable output.
+    --version, -v  Output version.
+    --help, -h     Output this usage text.
 
-Application dependencies (managed manually or by your favorite dependency management tool like the new built-in [`Go Modules`](https://github.com/golang/go/wiki/Modules) feature). The `go mod vendor` command will create the `/vendor` directory for you. Note that you might need to add the `-mod=vendor` flag to your `go build` command if you are not using Go 1.14 where it's on by default.
+Subcommands:
+    - cert  Certificate management
 
-Don't commit your application dependencies if you are building a library.
+Run `borzoi <subcommand> --help` for subcommand specific usage instructions.
 
-Note that since [`1.13`](https://golang.org/doc/go1.13#modules) Go also enabled the module proxy feature (using [`https://proxy.golang.org`](https://proxy.golang.org) as their module proxy server by default). Read more about it [`here`](https://blog.golang.org/module-mirror-launch) to see if it fits all of your requirements and constraints. If it does, then you won't need the `vendor` directory at all.
+Visit https://borzoi.xyz to learn more about Borzoi.
+```
 
-## Service Application Directories
+## Documentation
 
-### `/api`
+📖 [Read the docs](https://borzoi.xyz/docs)
 
-OpenAPI/Swagger specs, JSON schema files, protocol definition files.
+## Support
 
-See the [`/api`](api/README.md) directory for examples.
+Use [issues](https://github.com/dstotijn/borzoi/issues) for bug reports and
+feature requests, and
+[discussions](https://github.com/dstotijn/borzoi/discussions) for questions and
+troubleshooting.
 
-## Web Application Directories
+## Community
 
-### `/web`
+💬 [Join the Borzoi Discord server](https://discord.gg/3HVsj5pTFP)
 
-Web application specific components: static web assets, server side templates and SPAs.
+## Contributing
 
-## Common Application Directories
+Want to contribute? Great! Please check the [Contribution
+Guidelines](CONTRIBUTING.md) for details.
 
-### `/configs`
+## Acknowledgements
 
-Configuration file templates or default configs.
+- Thanks to the [Hacker101 community on Discord](https://www.hacker101.com/discord)
+  for the encouragement and early feedback.
+- The font used in the logo and admin interface is [JetBrains
+  Mono](https://www.jetbrains.com/lp/mono/).
 
-Put your `confd` or `consul-template` template files here.
+## Sponsors
 
-### `/init`
+<a href="https://www.tines.com/?utm_source=oss&utm_medium=sponsorship&utm_campaign=borzoi">
+<img src="https://borzoi.xyz/img/tines-sponsorship-badge.png" width="140" alt="Sponsored by Tines">
+</a>
 
-System init (systemd, upstart, sysv) and process manager/supervisor (runit, supervisord) configs.
+## License
 
-### `/scripts`
+[MIT](LICENSE)
 
-Scripts to perform various build, install, analysis, etc operations.
-
-These scripts keep the root level Makefile small and simple (e.g., [`https://github.com/hashicorp/terraform/blob/master/Makefile`](https://github.com/hashicorp/terraform/blob/master/Makefile)).
-
-See the [`/scripts`](scripts/README.md) directory for examples.
-
-### `/build`
-
-Packaging and Continuous Integration.
-
-Put your cloud (AMI), container (Docker), OS (deb, rpm, pkg) package configurations and scripts in the `/build/package` directory.
-
-Put your CI (travis, circle, drone) configurations and scripts in the `/build/ci` directory. Note that some of the CI tools (e.g., Travis CI) are very picky about the location of their config files. Try putting the config files in the `/build/ci` directory linking them to the location where the CI tools expect them (when possible).
-
-### `/deployments`
-
-IaaS, PaaS, system and container orchestration deployment configurations and templates (docker-compose, kubernetes/helm, mesos, terraform, bosh). Note that in some repos (especially apps deployed with kubernetes) this directory is called `/deploy`.
-
-### `/test`
-
-Additional external test apps and test data. Feel free to structure the `/test` directory anyway you want. For bigger projects it makes sense to have a data subdirectory. For example, you can have `/test/data` or `/test/testdata` if you need Go to ignore what's in that directory. Note that Go will also ignore directories or files that begin with "." or "_", so you have more flexibility in terms of how you name your test data directory.
-
-See the [`/test`](test/README.md) directory for examples.
-
-## Other Directories
-
-### `/docs`
-
-Design and user documents (in addition to your godoc generated documentation).
-
-See the [`/docs`](docs/README.md) directory for examples.
-
-### `/tools`
-
-Supporting tools for this project. Note that these tools can import code from the `/pkg` and `/internal` directories.
-
-See the [`/tools`](tools/README.md) directory for examples.
-
-### `/examples`
-
-Examples for your applications and/or public libraries.
-
-See the [`/examples`](examples/README.md) directory for examples.
-
-### `/third_party`
-
-External helper tools, forked code and other 3rd party utilities (e.g., Swagger UI).
-
-### `/githooks`
-
-Git hooks.
-
-### `/assets`
-
-Other assets to go along with your repository (images, logos, etc).
-
-### `/website`
-
-This is the place to put your project's website data if you are not using GitHub pages.
-
-See the [`/website`](website/README.md) directory for examples.
-
-## Directories You Shouldn't Have
-
-### `/src`
-
-Some Go projects do have a `src` folder, but it usually happens when the devs came from the Java world where it's a common pattern. If you can help yourself try not to adopt this Java pattern. You really don't want your Go code or Go projects to look like Java :-)
-
-Don't confuse the project level `/src` directory with the `/src` directory Go uses for its workspaces as described in [`How to Write Go Code`](https://golang.org/doc/code.html). The `$GOPATH` environment variable points to your (current) workspace (by default it points to `$HOME/go` on non-windows systems). This workspace includes the top level `/pkg`, `/bin` and `/src` directories. Your actual project ends up being a sub-directory under `/src`, so if you have the `/src` directory in your project the project path will look like this: `/some/path/to/workspace/src/your_project/src/your_code.go`. Note that with Go 1.11 it's possible to have your project outside of your `GOPATH`, but it still doesn't mean it's a good idea to use this layout pattern.
-
-
-## Badges
-
-* [Go Report Card](https://goreportcard.com/) - It will scan your code with `gofmt`, `go vet`, `gocyclo`, `golint`, `ineffassign`, `license` and `misspell`. Replace `github.com/golang-standards/project-layout` with your project reference.
-
-    [![Go Report Card](https://goreportcard.com/badge/github.com/golang-standards/project-layout?style=flat-square)](https://goreportcard.com/report/github.com/golang-standards/project-layout)
-
-* ~~[GoDoc](http://godoc.org) - It will provide online version of your GoDoc generated documentation. Change the link to point to your project.~~
-
-    [![Go Doc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square)](http://godoc.org/github.com/golang-standards/project-layout)
-
-* [Pkg.go.dev](https://pkg.go.dev) - Pkg.go.dev is a new destination for Go discovery & docs. You can create a badge using the [badge generation tool](https://pkg.go.dev/badge).
-
-    [![PkgGoDev](https://pkg.go.dev/badge/github.com/golang-standards/project-layout)](https://pkg.go.dev/github.com/golang-standards/project-layout)
-
-* Release - It will show the latest release number for your project. Change the github link to point to your project.
-
-    [![Release](https://img.shields.io/github/release/golang-standards/project-layout.svg?style=flat-square)](https://github.com/golang-standards/project-layout/releases/latest)
-
-## Notes
-
-A more opinionated project template with sample/reusable configs, scripts and code is a WIP.
+© 2022 Borzoi Software
