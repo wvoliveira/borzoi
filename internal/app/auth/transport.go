@@ -2,39 +2,42 @@ package auth
 
 import (
 	"fmt"
+	m "github.com/elga-io/borzoi/internal/pkg/middleware"
 	e "github.com/elga-io/canideos/errors"
 	"github.com/gorilla/mux"
+	"github.com/rs/zerolog/log"
 	"net/http"
-	"time"
 )
 
 func (s service) HTTPNew(r *mux.Router) {
-	// TODO add middlewares to check authentication and authorization.
 	rr := r.PathPrefix("/v1/auth").Subrouter()
+	rr.Use(m.Middleware{Cache: s.cache}.Auth)
 
 	rr.HandleFunc("/logout", s.HTTPLogout).Methods("GET")
 }
 
 func (s service) HTTPLogout(w http.ResponseWriter, r *http.Request) {
+	l := log.Ctx(r.Context())
+
 	// Decode request to object.
 	token, err := decodeLogout(r)
 	if err != nil {
-		fmt.Printf("%s error: decode logout: %s\n", time.Now(), err.Error())
+		l.Error().Caller().Msg(fmt.Sprintf("decode logout: %s", err.Error()))
 		e.EncodeError(w, err)
 		return
 	}
 
 	// Business logic.
-	err = s.Logout(nil, token)
+	err = s.Logout(r.Context(), token)
 	if err != nil {
-		fmt.Printf("%s error: service logout: %s\n", time.Now(), err.Error())
+		l.Error().Caller().Msg(fmt.Sprintf("service logout: %s", err.Error()))
 		e.EncodeError(w, err)
 		return
 	}
 
 	err = encodeLogout(w)
 	if err != nil {
-		fmt.Printf("%s error: service logout: %s\n", time.Now(), err.Error())
+		l.Error().Caller().Msg(fmt.Sprintf("encode logout: %s", err.Error()))
 		e.EncodeError(w, err)
 		return
 	}

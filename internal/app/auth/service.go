@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/dgraph-io/badger/v3"
 	"github.com/gorilla/mux"
-	zl "github.com/rs/zerolog/log"
+	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 	"net/http"
 )
@@ -31,12 +31,14 @@ func NewService(db *gorm.DB, cache *badger.DB) Service {
 
 // Logout remove cookie and refresh token from database.
 func (s service) Logout(ctx context.Context, token string) (err error) {
+	l := log.Ctx(ctx)
+
 	key := fmt.Sprintf("auth/tokens/%s", token)
 	err = s.cache.Update(func(txn *badger.Txn) (err error) {
 		_, err = txn.Get([]byte(key))
 
 		if err == badger.ErrKeyNotFound {
-			zl.Warn().Caller().Msg(fmt.Sprintf("token %s was not found", token))
+			l.Warn().Caller().Msg(fmt.Sprintf("token %s was not found", token))
 			return errors.New("token was not found")
 		}
 
@@ -45,7 +47,7 @@ func (s service) Logout(ctx context.Context, token string) (err error) {
 	})
 
 	if err != nil {
-		zl.Error().Caller().Msg(fmt.Sprintf("to delete token in cache: %s", err.Error()))
+		l.Error().Caller().Msg(fmt.Sprintf("to delete token in cache: %s", err.Error()))
 		return
 	}
 	return

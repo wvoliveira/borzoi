@@ -21,7 +21,7 @@ import (
 // Service encapsulates the authentication logic.
 type Service interface {
 	Login(ctx context.Context, identity entity.Identity) (string, error)
-	Register(ctx context.Context, identity entity.Identity) error
+	Register(ctx context.Context, identity entity.Identity, user entity.User) error
 
 	HTTPNew(r *mux.Router)
 	HTTPLogin(w http.ResponseWriter, r *http.Request)
@@ -48,8 +48,7 @@ func NewService(db *gorm.DB, cache *badger.DB) Service {
 	return service{db, cache}
 }
 
-// Login authenticates a user and generates a JWT token if authentication succeeds.
-// Otherwise, an error is returned.
+// Login authenticates a user and set a cookie session if authentication succeeds.
 func (s service) Login(ctx context.Context, identity entity.Identity) (token string, err error) {
 	l := log.Ctx(ctx)
 
@@ -58,9 +57,11 @@ func (s service) Login(ctx context.Context, identity entity.Identity) (token str
 	err = s.db.Model(&entity.Identity{}).Where("provider = ? AND uid = ?", identity.Provider, identity.UID).First(&identityDB).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		l.Warn().Caller().Msg(fmt.Sprintf("this provider + uid was not found in database: %s", err.Error()))
+		l.Warn().Caller().Msg(fmt.Sprintf("provider %s + uid %s was not found in database", identity.Provider, identity.UID))
 		return token, e.ErrAuthUnauthorized
-	} else if err != nil {
+	}
+
+	if err != nil {
 		l.Error().Caller().Msg(fmt.Sprintf("when get identity from database: %s", err.Error()))
 		return token, e.ErrInternalServerError
 	}
@@ -71,13 +72,15 @@ func (s service) Login(ctx context.Context, identity entity.Identity) (token str
 	}
 
 	// Get user info.
-	user := entity.User{}
-	err = s.db.Model(&entity.User{}).Where("id = ?", identityDB.UserID).First(&user).Error
+	user := entity.User{ID: identityDB.UserID}
+	err = s.db.Model(&user).Preload("Identities").Find(&user).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		l.Warn().Caller().Msg(fmt.Sprintf("user_id %s was not found", identityDB.UserID))
 		return token, e.ErrUserNotFound
-	} else if err != nil {
+	}
+
+	if err != nil {
 		l.Error().Caller().Msg(err.Error())
 		return token, e.ErrInternalServerError
 	}
@@ -100,7 +103,7 @@ func (s service) Login(ctx context.Context, identity entity.Identity) (token str
 }
 
 // Register a new user to our database.
-func (s service) Register(ctx context.Context, identity entity.Identity) (err error) {
+func (s service) Register(ctx context.Context, identity entity.Identity, user entity.User) (err error) {
 	l := log.Ctx(ctx)
 
 	// Check if identity exists.
@@ -115,7 +118,6 @@ func (s service) Register(ctx context.Context, identity entity.Identity) (err er
 		return e.ErrInternalServerError
 	}
 
-	user := entity.User{}
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(identity.Password), 8)
 	if err != nil {
 		l.Error().Caller().Msg(fmt.Sprintf("when creating a hashed password: %s", err.Error()))

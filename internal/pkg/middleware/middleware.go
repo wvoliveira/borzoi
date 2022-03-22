@@ -45,22 +45,25 @@ type Middleware struct {
 // Auth checks if the client is authenticated
 func (m Middleware) Auth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		l := log.Ctx(r.Context())
+
 		id := unique.GetUUID(r.Context())
 		cookie, err := r.Cookie("session")
 		if err != nil {
 			if errors.Is(err, http.ErrNoCookie) {
-				log.Warn().Caller().Str("id", id).Str("text", http.ErrNoCookie.Error()).Msg("service")
+				l.Warn().Caller().Str("id", id).Str("text", http.ErrNoCookie.Error()).Msg("service")
 				e.EncodeError(w, e.ErrAuthUnauthorized)
 				return
 			}
-			log.Error().Caller().Msg(fmt.Sprintf("to get session from cookie: %s", err.Error()))
+			l.Error().Caller().Msg(fmt.Sprintf("to get session from cookie: %s", err.Error()))
 			e.EncodeError(w, err)
 			return
 		}
 
 		key := fmt.Sprintf(constant.KeySession, cookie.Value)
-		u, err := user.GetUserBySession(m.Cache, []byte(key))
+		u, err := user.GetUserBySession(r.Context(), m.Cache, []byte(key))
 		if err != nil {
+			l.Error().Caller().Msg(err.Error())
 			e.EncodeError(w, err)
 			return
 		}

@@ -3,7 +3,10 @@ package user
 import (
 	"encoding/json"
 	"errors"
+	"github.com/elga-io/borzoi/internal/pkg/entity"
+	e "github.com/elga-io/canideos/errors"
 	"github.com/gorilla/mux"
+	"github.com/rs/zerolog/log"
 	"io/ioutil"
 	"net/http"
 )
@@ -17,6 +20,7 @@ type updateRequest struct {
 	Name string `json:"name"`
 }
 
+// GET /v1/users/{id}
 func decodeFindByID(r *http.Request) (req findByIDRequest, err error) {
 	vars := mux.Vars(r)
 	id := vars["id"]
@@ -26,6 +30,7 @@ func decodeFindByID(r *http.Request) (req findByIDRequest, err error) {
 	return
 }
 
+// PATCH /v1/users/{id}
 func decodeUpdate(r *http.Request) (req updateRequest, err error) {
 	vars := mux.Vars(r)
 	id := vars["id"]
@@ -46,6 +51,20 @@ func decodeUpdate(r *http.Request) (req updateRequest, err error) {
 	err = json.Unmarshal(body, &req)
 	if err != nil {
 		return
+	}
+	return
+}
+
+// GET /v1/users/me
+func decodeFindMe(r *http.Request) (user entity.User, err error) {
+	l := log.Ctx(r.Context())
+
+	if u := r.Context().Value("user"); u != nil {
+		user = u.(entity.User)
+	}
+	if user.ID == "" {
+		l.Warn().Caller().Msg("user ID not found from session cookie")
+		return user, e.ErrUserNotFound
 	}
 	return
 }

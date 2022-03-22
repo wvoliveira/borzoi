@@ -10,7 +10,7 @@ type Identity struct {
 
 	Provider string `json:"provider"` // phone, email, wechat, github...
 	UID      string `json:"uid"`      // e-mail, google id, facebook id, etc
-	Password string `json:"password"`
+	Password string `json:"password,omitempty"`
 	UserID   string `json:"user_id"`
 
 	Verified   *bool      `json:"verified" gorm:"default:false"`

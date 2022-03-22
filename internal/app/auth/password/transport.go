@@ -47,9 +47,10 @@ func (s service) HTTPRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	identity := entity.Identity{Provider: "email", UID: dr.Email, Password: dr.Password}
+	user := entity.User{Name: dr.Name}
 
 	// Business logic.
-	err = s.Register(r.Context(), identity)
+	err = s.Register(r.Context(), identity, user)
 	if err != nil {
 		e.EncodeError(w, err)
 		return

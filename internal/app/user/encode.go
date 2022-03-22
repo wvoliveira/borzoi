@@ -28,3 +28,15 @@ func encodeUpdate(w http.ResponseWriter, link entity.User) (err error) {
 	})
 	return
 }
+
+// GET /v1/users/me
+func encodeFindMe(w http.ResponseWriter, user entity.User) (err error) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(res.Response{
+		Status:  "successful",
+		Data:    user,
+		Message: "",
+	})
+	return
+}

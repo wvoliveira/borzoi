@@ -1,12 +1,13 @@
 package user
 
 import (
+	"context"
 	"fmt"
 	"github.com/dgraph-io/badger/v3"
 	"github.com/elga-io/borzoi/internal/pkg/entity"
 	e "github.com/elga-io/canideos/errors"
 	"github.com/gorilla/mux"
-	zl "github.com/rs/zerolog/log"
+	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 	"net/http"
 	"time"
@@ -14,8 +15,8 @@ import (
 
 // Service encapsulates the link service logic, http handlers and another transport layer.
 type Service interface {
-	FindByID(id string) (user entity.User, err error)
-	Update(id string, payload entity.User) (link entity.User, err error)
+	FindByID(ctx context.Context, id string) (user entity.User, err error)
+	Update(ctx context.Context, id string, payload entity.User) (link entity.User, err error)
 
 	HTTPNew(r *mux.Router)
 	HTTPFindAll(w http.ResponseWriter, r *http.Request)
@@ -37,36 +38,56 @@ func NewService(db *gorm.DB, cache *badger.DB) Service {
 }
 
 // FindByID get a shortener link from id.
-func (s service) FindByID(id string) (user entity.User, err error) {
+func (s service) FindByID(ctx context.Context, id string) (user entity.User, err error) {
+	l := log.Ctx(ctx)
 	user.ID = id
 
-	err = s.db.Debug().Model(&user).Preload("Identities").Find(&user).Error
+	err = s.db.Model(&user).Preload("Identities").Find(&user).Error
 	if err == gorm.ErrRecordNotFound {
-		zl.Warn().Caller().Msg(fmt.Sprintf("user with id '%s' was not found", id))
+		l.Warn().Caller().Msg(fmt.Sprintf("user with id '%s' was not found", id))
 		return user, e.ErrNotFound
 	}
 	if err != nil {
-		zl.Error().Caller().Msg(err.Error())
+		l.Error().Caller().Msg(err.Error())
 		return
 	}
 	return
 }
 
 // Update change specific user by ID.
-func (s service) Update(id string, payload entity.User) (user entity.User, err error) {
+func (s service) Update(ctx context.Context, id string, payload entity.User) (user entity.User, err error) {
+	l := log.Ctx(ctx)
+
 	t := time.Now()
 	payload.UpdatedAt = &t
 
 	err = s.db.Model(&entity.User{}).Where("id = ?", id).Updates(&payload).Error
 	if err == gorm.ErrRecordNotFound {
-		zl.Info().Caller().Msg(fmt.Sprintf("the user with id '%s' was not found", id))
+		l.Info().Caller().Msg(fmt.Sprintf("the user with id '%s' was not found", id))
 		return user, e.ErrUserNotFound
 	}
 
 	if err != nil {
-		zl.Error().Caller().Msg(err.Error())
+		l.Error().Caller().Msg(err.Error())
 		return
 	}
 	user = payload
+	return
+}
+
+// FindMe get a shortener link from id.
+func (s service) FindMe(ctx context.Context, payload entity.User) (user entity.User, err error) {
+	l := log.Ctx(ctx)
+	// TODO: Change or check if user is enable/active.
+	l.Warn().Caller().Msg("service not implemented. Just pass user info from cookie session")
+
+	user = payload
+	user.Identities = []entity.Identity{}
+
+	// Set blank password to answer request.
+	for _, identity := range payload.Identities {
+		identity.Password = ""
+		user.Identities = append(user.Identities, identity)
+	}
 	return
 }

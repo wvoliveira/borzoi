@@ -14,7 +14,7 @@ type Response struct {
 
 func NotImplemented(w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusNotImplemented)
 	_ = json.NewEncoder(w).Encode(Response{
 		Status:  "successful",
 		Message: "not implemented yet",
