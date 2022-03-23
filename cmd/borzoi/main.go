@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/elga-io/borzoi/internal/app/auth"
 	"github.com/elga-io/borzoi/internal/app/auth/password"
+	"github.com/elga-io/borzoi/internal/app/client"
 	"github.com/elga-io/borzoi/internal/app/user"
 	"github.com/elga-io/borzoi/internal/pkg/config"
 	"github.com/elga-io/borzoi/internal/pkg/entity"
@@ -53,7 +54,13 @@ func main() {
 	cache := database.NewNoSQLDatabase("badger", "./.db/cache")
 
 	if *fMigrate {
-		err = db.AutoMigrate(entity.Identity{}, entity.User{})
+		err = db.AutoMigrate(
+			entity.Identity{},
+			entity.User{},
+			entity.Phone{},
+			entity.Email{},
+			entity.Note{},
+			entity.Client{})
 		if err != nil {
 			log.Fatal().Msg(fmt.Sprintf("in indetities migration: %s", err.Error()))
 		}
@@ -81,6 +88,9 @@ func main() {
 
 	userService := user.NewService(db, cache)
 	userService.HTTPNew(apiRouter)
+
+	clientService := client.NewService(db, cache)
+	clientService.HTTPNew(apiRouter)
 
 	webHandler := http.FileServer(http.FS(distFS))
 	webRouter.PathPrefix("").Handler(webHandler)

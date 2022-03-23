@@ -29,6 +29,7 @@ var (
 
 	// ErrUserNotFound error when user not found in database.
 	ErrUserNotFound = errors.New("user not found")
+
 	// ErrAccountDeleteYourSelf user admin or user with permission with that cannot delete yourself.
 	ErrAccountDeleteYourSelf = errors.New("delete yourself? this is not a good idea")
 
@@ -38,6 +39,10 @@ var (
 	ErrLinkInvalidDomain  = errors.New("try to input a valid domain")
 	ErrLinkInvalidKeyword = errors.New("try to input a valid keyword between 6 and 15 chars")
 	ErrLinkInvalidURL     = errors.New("try to input a valid destination (URL)")
+
+	// ErrClientNotFound default clients errors.
+	ErrClientNotFound   = errors.New("client not found")
+	ErrClientBadRequest = errors.New("you need send a body with name")
 
 	// Internal errors.
 	ErrInternalServerError = errors.New("internal server error")
@@ -49,7 +54,7 @@ var (
 
 type response struct {
 	Status  string      `json:"status"`
-	Data    interface{} `json:"data"`
+	Data    interface{} `json:"data,omitempty"`
 	Message string      `json:"message,omitempty"`
 }
 
@@ -79,7 +84,8 @@ func codeFrom(err error) int {
 	switch err {
 	case ErrNotFound, ErrLinkNotFound:
 		return http.StatusNotFound
-	case ErrInconsistentIDs, ErrAccountDeleteYourSelf, ErrLinkAlreadyExists, ErrAlreadyExists, ErrLinkInvalidDomain, ErrLinkInvalidKeyword, ErrLinkInvalidURL:
+	case ErrInconsistentIDs, ErrAccountDeleteYourSelf, ErrLinkAlreadyExists, ErrAlreadyExists, ErrLinkInvalidDomain,
+		ErrLinkInvalidKeyword, ErrLinkInvalidURL, ErrClientBadRequest:
 		return http.StatusBadRequest
 	case ErrAuthUnauthorized, ErrTokenNotFound, ErrTokenParse, ErrTokenExpired:
 		return http.StatusUnauthorized

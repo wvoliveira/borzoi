@@ -10,7 +10,6 @@ import (
 	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 	"net/http"
-	"time"
 )
 
 // Service encapsulates the link service logic, http handlers and another transport layer.
@@ -57,9 +56,6 @@ func (s service) FindByID(ctx context.Context, id string) (user entity.User, err
 // Update change specific user by ID.
 func (s service) Update(ctx context.Context, id string, payload entity.User) (user entity.User, err error) {
 	l := log.Ctx(ctx)
-
-	t := time.Now()
-	payload.UpdatedAt = &t
 
 	err = s.db.Model(&entity.User{}).Where("id = ?", id).Updates(&payload).Error
 	if err == gorm.ErrRecordNotFound {

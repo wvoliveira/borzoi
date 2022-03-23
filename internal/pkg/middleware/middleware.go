@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"github.com/dgraph-io/badger/v3"
 	"github.com/elga-io/borzoi/internal/pkg/session"
-	"github.com/elga-io/borzoi/internal/pkg/unique"
 	e "github.com/elga-io/canideos/errors"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog"
@@ -46,11 +45,10 @@ func (m Middleware) Auth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		l := log.Ctx(r.Context())
 
-		id := unique.GetUUID(r.Context())
 		cookie, err := r.Cookie("session")
 		if err != nil {
 			if errors.Is(err, http.ErrNoCookie) {
-				l.Warn().Caller().Str("id", id).Str("text", http.ErrNoCookie.Error()).Msg("service")
+				l.Warn().Caller().Msg(http.ErrNoCookie.Error())
 				e.EncodeError(w, e.ErrAuthUnauthorized)
 				return
 			}
