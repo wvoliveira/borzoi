@@ -68,13 +68,13 @@ func (s service) HTTPUpdate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s service) HTTPFindMe(w http.ResponseWriter, r *http.Request) {
-	user, err := decodeFindMe(r)
+	userID, err := decodeFindMe(r)
 	if err != nil {
 		e.EncodeError(w, err)
 		return
 	}
 
-	user, err = s.FindMe(r.Context(), user)
+	user, err := s.FindMe(r.Context(), userID)
 	if err != nil {
 		e.EncodeError(w, err)
 		return

@@ -76,16 +76,21 @@ func (s service) Update(ctx context.Context, id string, payload entity.User) (us
 }
 
 // FindMe get a shortener link from id.
-func (s service) FindMe(ctx context.Context, payload entity.User) (user entity.User, err error) {
+func (s service) FindMe(ctx context.Context, userID string) (user entity.User, err error) {
 	l := log.Ctx(ctx)
-	// TODO: Change or check if user is enable/active.
-	l.Warn().Caller().Msg("service not implemented. Just pass user info from cookie session")
 
-	user = payload
+	userDB := entity.User{}
+	err = s.db.Model(&userDB).Preload("Identities").Where("id = ?", userID).Find(&userDB).Error
+	if err != nil {
+		l.Error().Caller().Msg(err.Error())
+		return
+	}
+
+	user = userDB
 	user.Identities = []entity.Identity{}
 
 	// Set blank password to answer request.
-	for _, identity := range payload.Identities {
+	for _, identity := range userDB.Identities {
 		identity.Password = ""
 		user.Identities = append(user.Identities, identity)
 	}

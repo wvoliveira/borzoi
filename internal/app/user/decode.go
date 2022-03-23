@@ -3,7 +3,7 @@ package user
 import (
 	"encoding/json"
 	"errors"
-	"github.com/elga-io/borzoi/internal/pkg/entity"
+	"github.com/elga-io/borzoi/internal/pkg/session"
 	e "github.com/elga-io/canideos/errors"
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog/log"
@@ -56,15 +56,13 @@ func decodeUpdate(r *http.Request) (req updateRequest, err error) {
 }
 
 // GET /v1/users/me
-func decodeFindMe(r *http.Request) (user entity.User, err error) {
+func decodeFindMe(r *http.Request) (userID string, err error) {
 	l := log.Ctx(r.Context())
+	userID = session.UserGetIDFromContext(r.Context())
 
-	if u := r.Context().Value("user"); u != nil {
-		user = u.(entity.User)
-	}
-	if user.ID == "" {
+	if userID == "" {
 		l.Warn().Caller().Msg("user ID not found from session cookie")
-		return user, e.ErrUserNotFound
+		return userID, e.ErrUserNotFound
 	}
 	return
 }

@@ -10,9 +10,7 @@ type User struct {
 	CreatedAt time.Time  `json:"created_at"`
 	UpdatedAt *time.Time `json:"updated_at"`
 
-	Name   string `json:"name"`
-	Role   string `json:"role"`
-	Active *bool  `json:"active" gorm:"default:true"`
+	Name string `json:"name"`
 
 	Identities []Identity
 }

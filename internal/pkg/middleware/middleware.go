@@ -6,9 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/dgraph-io/badger/v3"
-	"github.com/elga-io/borzoi/internal/pkg/constant"
+	"github.com/elga-io/borzoi/internal/pkg/session"
 	"github.com/elga-io/borzoi/internal/pkg/unique"
-	"github.com/elga-io/borzoi/internal/pkg/user"
 	e "github.com/elga-io/canideos/errors"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog"
@@ -60,20 +59,20 @@ func (m Middleware) Auth(next http.Handler) http.Handler {
 			return
 		}
 
-		key := fmt.Sprintf(constant.KeySession, cookie.Value)
-		u, err := user.GetUserBySession(r.Context(), m.Cache, []byte(key))
+		key := fmt.Sprintf(session.CacheKey, cookie.Value)
+		userID, err := session.UserGetIDFromSession(r.Context(), m.Cache, []byte(key))
 		if err != nil {
 			l.Error().Caller().Msg(err.Error())
 			e.EncodeError(w, err)
 			return
 		}
 
-		if u.ID == "" {
+		if userID == "" {
 			e.EncodeError(w, e.ErrAuthUnauthorized)
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), "user", u)
+		ctx := context.WithValue(r.Context(), "user_id", userID)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

@@ -2,12 +2,11 @@ package password
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/dgraph-io/badger/v3"
-	"github.com/elga-io/borzoi/internal/pkg/constant"
 	"github.com/elga-io/borzoi/internal/pkg/entity"
+	"github.com/elga-io/borzoi/internal/pkg/session"
 	e "github.com/elga-io/canideos/errors"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
@@ -86,16 +85,10 @@ func (s service) Login(ctx context.Context, identity entity.Identity) (token str
 	}
 
 	token = uuid.New().String()
-	key := fmt.Sprintf(constant.KeySession, token)
+	key := fmt.Sprintf(session.CacheKey, token)
 
 	err = s.cache.Update(func(txn *badger.Txn) (err error) {
-		data, err := json.Marshal(user)
-		if err != nil {
-			l.Error().Caller().Msg(err.Error())
-			return
-		}
-
-		ee := badger.NewEntry([]byte(key), data).WithTTL(time.Hour * 12)
+		ee := badger.NewEntry([]byte(key), []byte(user.ID)).WithTTL(time.Hour * 12)
 		err = txn.SetEntry(ee)
 		return
 	})
@@ -128,11 +121,8 @@ func (s service) Register(ctx context.Context, identity entity.Identity, user en
 	identity.CreatedAt = time.Now()
 	identity.Password = string(hashedPassword)
 
-	t := true
 	user.ID = uuid.New().String()
 	user.CreatedAt = time.Now()
-	user.Role = "user"
-	user.Active = &t
 	user.Identities = append(user.Identities, identity)
 
 	err = s.db.Model(&entity.User{}).Create(&user).Error
