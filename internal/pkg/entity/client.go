@@ -1,6 +1,8 @@
 package entity
 
 import (
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 	"time"
 )
 
@@ -21,6 +23,11 @@ type Client struct {
 	UserID string `json:"user_id"`
 }
 
+func (c *Client) BeforeCreate(_ *gorm.DB) (err error) {
+	c.ID = uuid.New().String()
+	return
+}
+
 // Phone represents phone number with notes.
 type Phone struct {
 	ID        string    `json:"id" gorm:"primaryKey;autoIncrement:false"`
@@ -32,6 +39,11 @@ type Phone struct {
 
 	// Relationship with Client model.
 	ClientID string `json:"client_id"`
+}
+
+func (p *Phone) BeforeCreate(_ *gorm.DB) (err error) {
+	p.ID = uuid.New().String()
+	return
 }
 
 // Email represents email with notes.
@@ -47,6 +59,12 @@ type Email struct {
 	ClientID string `json:"client_id"`
 }
 
+func (e *Email) BeforeCreate(_ *gorm.DB) (err error) {
+	e.ID = uuid.New().String()
+	return
+}
+
+// Note add some text notes for client or any struct.
 type Note struct {
 	ID        string    `json:"id" gorm:"primaryKey;autoIncrement:false"`
 	CreatedAt time.Time `json:"created_at"`
@@ -56,4 +74,9 @@ type Note struct {
 
 	// Relationship with Client model.
 	ClientID string `json:"client_id"`
+}
+
+func (n *Note) BeforeCreate(_ *gorm.DB) (err error) {
+	n.ID = uuid.New().String()
+	return
 }

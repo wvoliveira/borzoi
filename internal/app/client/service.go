@@ -38,16 +38,25 @@ func NewService(db *gorm.DB, cache *badger.DB) Service {
 }
 
 // FindAll get a list of clients.
-func (s service) FindAll(ctx context.Context, search string, limit, offset int) (clients []entity.Client, err error) {
+func (s service) FindAll(ctx context.Context, search string, page, limit int) (clients []entity.Client, err error) {
 	l := log.Ctx(ctx)
 	userID := session.UserGetIDFromContext(ctx)
 
-	err = s.db.Model(&entity.Client{}).
+	offset := 0
+	if page > 1 {
+		offset = page * limit
+	}
+
+	query := s.db.Model(&entity.Client{}).
+		Debug().
 		Limit(limit).
-		Offset(offset).
-		Where("name LIKE ?", fmt.Sprintf("%[1]s%s%[1]s", "%", search)).
-		Where("user_id = ?", userID).
-		Find(&clients).Error
+		Offset(offset)
+
+	if search != "" {
+		query = query.Where("name LIKE ?", fmt.Sprintf("%[1]s%s%[1]s", "%", search))
+	}
+
+	err = query.Where("user_id = ?", userID).Find(&clients).Error
 
 	if len(clients) == 0 {
 		l.Warn().Caller().Msg(fmt.Sprintf("clients with search=%s limit=%d offset=%d was not found", search, limit, offset))
@@ -64,8 +73,10 @@ func (s service) FindAll(ctx context.Context, search string, limit, offset int) 
 func (s service) Create(ctx context.Context, client entity.Client) (err error) {
 	l := log.Ctx(ctx)
 	userID := session.UserGetIDFromContext(ctx)
+	client.UserID = userID
+	client.Active = "true"
 
-	err = s.db.Model(&client).Where("user_id = ?", userID).Create(&client).Error
+	err = s.db.Model(&client).Create(&client).Error
 	if err != nil {
 		l.Error().Caller().Msg(err.Error())
 	}
@@ -113,12 +124,14 @@ func (s service) Update(ctx context.Context, id string, payload entity.Client) (
 func (s service) Delete(ctx context.Context, id string, delete bool) (client entity.Client, err error) {
 	l := log.Ctx(ctx)
 	userID := session.UserGetIDFromContext(ctx)
+	client.ID = id
+	client.UserID = userID
 
 	if delete {
-		err = s.db.Model(&client).Where("user_id = ?", userID).Where("id = ?", id).Delete(&client).Error
+		err = s.db.Model(&client).Find(&client).Delete(&client).Error
 	} else {
 		client.Active = "false"
-		err = s.db.Model(&entity.User{}).Where("user_id = ?", userID).Where("id = ?", id).Updates(&client).Error
+		err = s.db.Model(&client).Updates(&client).Find(&client).Error
 	}
 
 	if err == gorm.ErrRecordNotFound {

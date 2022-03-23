@@ -3,7 +3,6 @@ package client
 import (
 	"github.com/elga-io/borzoi/internal/pkg/entity"
 	m "github.com/elga-io/borzoi/internal/pkg/middleware"
-	res "github.com/elga-io/borzoi/internal/pkg/response"
 	e "github.com/elga-io/canideos/errors"
 	"github.com/gorilla/mux"
 	"net/http"
@@ -21,7 +20,23 @@ func (s service) HTTPNew(r *mux.Router) {
 }
 
 func (s service) HTTPFindAll(w http.ResponseWriter, r *http.Request) {
-	res.NotImplemented(w)
+	search, page, limit, err := decodeFindAll(r)
+	if err != nil {
+		e.EncodeError(w, err)
+		return
+	}
+
+	clients, err := s.FindAll(r.Context(), search, page, limit)
+	if err != nil {
+		e.EncodeError(w, err)
+		return
+	}
+
+	err = encodeFindAll(w, clients)
+	if err != nil {
+		e.EncodeError(w, err)
+		return
+	}
 	return
 }
 
@@ -89,6 +104,22 @@ func (s service) HTTPUpdate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s service) HTTPDelete(w http.ResponseWriter, r *http.Request) {
-	res.NotImplemented(w)
+	id, del, err := decodeDelete(r)
+	if err != nil {
+		e.EncodeError(w, err)
+		return
+	}
+
+	client, err := s.Delete(r.Context(), id, del)
+	if err != nil {
+		e.EncodeError(w, err)
+		return
+	}
+
+	err = encodeDelete(w, client)
+	if err != nil {
+		e.EncodeError(w, err)
+		return
+	}
 	return
 }

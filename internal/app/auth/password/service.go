@@ -118,11 +118,9 @@ func (s service) Register(ctx context.Context, identity entity.Identity, user en
 	}
 
 	identity.ID = uuid.New().String()
-	identity.CreatedAt = time.Now()
 	identity.Password = string(hashedPassword)
 
 	user.ID = uuid.New().String()
-	user.CreatedAt = time.Now()
 	user.Identities = append(user.Identities, identity)
 
 	err = s.db.Model(&entity.User{}).Create(&user).Error
