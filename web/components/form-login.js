@@ -1,46 +1,82 @@
-import * as React from "react";
-import {GetUser, SetUser} from '../lib/user';
-import {AuthPassword, SetAuth} from '../lib/auth';
+import Router from "next/router";
+import React from "react";
+import { mutate } from "swr";
+
+import { AuthAPI } from "../lib/api/auth";
+import { UserAPI } from "../lib/api/user";
 
 export default function FormLogin() {
-    const [loading, setLoading] = React.useState(false);
-    const [error, setError] = React.useState("");
+    const [isLoading, setLoading] = React.useState(false);
+    const [errors, setErrors] = React.useState([]);
+    const [email, setEmail] = React.useState("");
+    const [password, setPassword] = React.useState("");
 
-    const handleSubmit = async (event) => {
+    const handleEmailChange = React.useCallback(
+        (e) => setEmail(e.target.value),
+        []
+    );
+    const handlePasswordChange = React.useCallback(
+        (e) => setPassword(e.target.value),
+        []
+    );
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
         setLoading(true);
-        event.preventDefault();
 
-        const inputs = new FormData(event.currentTarget);
+        console.log("email: " + email);
+        console.log("password: " + password);
 
-        const payload = {
-            "email": inputs.get('email'),
-            "password": inputs.get('password'),
-        }
-        console.log("email: " + payload.email + " password: " + payload.password);
-
-        AuthPassword(payload.email, payload.password)
-            .then(response => {
-                setLoading(false);
-                if (!response.ok) {
-                    if (response.status !== 500) {
-                        let data = response.json();
-                        setError(data.message);
-                    } else {
-                        setError("Unknown error.");
-                    }
-                } else {
-                    SetAuth();
+        try {
+            const { data, status } = await AuthAPI.Login(email, password);
+            if (status !== 200) {
+                setErrors(data.errors);
+            }
+            
+            if (status === 200) {
+                const { data, status } = await UserAPI.Me();
+                if (status !== 200) {
+                    setErrors(data.errors);
                 }
-            })
+                if (data) {
+                    console.log(data);
+                    window.localStorage.setItem("user", JSON.stringify(data.data));
+                    mutate("user", data?.data);
+                    Router.push("/");
+                }
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
         <form onSubmit={handleSubmit}>
-            Email: <input name="email"/><br/>
-            Password: <input name="password"/><br/>
-            <button>Login</button><br/>
-            {loading ? "Loading..." : ""}
-            {error ? error : ""}
+            Email:{" "}
+            <input
+                name="email"
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={handleEmailChange}
+            />
+            <br />
+            Password:{" "}
+            <input
+                name="password"
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={handlePasswordChange}
+            />
+            <br />
+            <button type="submit" disabled={isLoading}>
+                Login
+            </button>
+            <br />
+            {errors ? errors : ""}
         </form>
-    )
+    );
 }

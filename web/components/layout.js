@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import Link from 'next/link'
-import { default as config } from "../lib/config";
+import { default as config } from "../lib/utils/config";
 
 import "@fontsource/lato";
 import "@fontsource/roboto";
