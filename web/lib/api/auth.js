@@ -1,10 +1,11 @@
 import axios from "axios";
+import React from "react";
 
 export const AuthAPI = {
     Login: async(email, password) => {
         try {
             const response = await axios.post(
-                '/api/v1/auth/password/login',
+                '/api/auth/password/login',
                 JSON.stringify({ "email": email, "password": password }), {
                     headers: {
                         "Accept": "application/json",
@@ -20,7 +21,7 @@ export const AuthAPI = {
     Register: async(name, email, password) => {
         try {
             const response = await axios.post(
-                '/api/v1/auth/password/register',
+                '/api/auth/password/register',
                 JSON.stringify({ user: { name, email, password } }), {
                     headers: {
                         "Content-Type": "application/json",

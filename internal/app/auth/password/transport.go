@@ -9,7 +9,7 @@ import (
 
 func (s service) HTTPNew(r *mux.Router) {
 	// TODO: middleware to check cookie authentication.
-	rr := r.PathPrefix("/v1/auth/password").Subrouter()
+	rr := r.PathPrefix("/auth/password").Subrouter()
 
 	rr.HandleFunc("/login", s.HTTPLogin).Methods("POST")
 	rr.HandleFunc("/register", s.HTTPRegister).Methods("POST")

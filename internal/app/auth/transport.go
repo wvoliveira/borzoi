@@ -10,10 +10,9 @@ import (
 )
 
 func (s service) HTTPNew(r *mux.Router) {
-	rr := r.PathPrefix("/v1/auth").Subrouter()
+	rr := r.PathPrefix("/auth").Subrouter()
 	rr.Use(m.Middleware{Cache: s.cache}.Auth)
-
-	rr.HandleFunc("/logout", s.HTTPLogout).Methods("GET")
+	rr.HandleFunc("/logout", s.HTTPLogout).Methods("POST")
 }
 
 func (s service) HTTPLogout(w http.ResponseWriter, r *http.Request) {

@@ -1,9 +1,7 @@
 import Router from "next/router";
 import React from "react";
-import { mutate } from "swr";
 
-import { AuthAPI } from "../lib/api/auth";
-import { UserAPI } from "../lib/api/user";
+import {AuthAPI} from "../lib/api/auth";
 
 export default function FormLogin() {
     const [isLoading, setLoading] = React.useState(false);
@@ -28,22 +26,14 @@ export default function FormLogin() {
         console.log("password: " + password);
 
         try {
-            const { data, status } = await AuthAPI.Login(email, password);
-            if (status !== 200) {
-                setErrors(data.errors);
+            const {data, status} = await AuthAPI.Login(email, password);
+            if (status !== 200 && status !== 500) {
+                setErrors(data.message);
+                console.log(data.message);
             }
-            
+
             if (status === 200) {
-                const { data, status } = await UserAPI.Me();
-                if (status !== 200) {
-                    setErrors(data.errors);
-                }
-                if (data) {
-                    console.log(data);
-                    window.localStorage.setItem("user", JSON.stringify(data.data));
-                    mutate("user", data?.data);
-                    Router.push("/");
-                }
+                Router.push("/");
             }
         } catch (error) {
             console.error(error);
@@ -62,7 +52,7 @@ export default function FormLogin() {
                 value={email}
                 onChange={handleEmailChange}
             />
-            <br />
+            <br/>
             Password:{" "}
             <input
                 name="password"
@@ -71,11 +61,11 @@ export default function FormLogin() {
                 value={password}
                 onChange={handlePasswordChange}
             />
-            <br />
+            <br/>
             <button type="submit" disabled={isLoading}>
                 Login
             </button>
-            <br />
+            <br/>
             {errors ? errors : ""}
         </form>
     );

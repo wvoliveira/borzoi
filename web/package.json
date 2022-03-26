@@ -23,6 +23,7 @@
     "chart.js": "^3.7.1",
     "gray-matter": "^4.0.3",
     "next": "latest",
+    "next-auth": "^4.3.1",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "swr": "^1.2.2"
