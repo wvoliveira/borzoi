@@ -12,14 +12,15 @@ type response struct {
 }
 
 func encodeLogout(w http.ResponseWriter) (err error) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-
 	cookie := &http.Cookie{
 		Name:   "session",
+		Path:   "/",
 		MaxAge: -1,
 	}
 	http.SetCookie(w, cookie)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
 	err = json.NewEncoder(w).Encode(response{
 		Status: "successful",
 	})

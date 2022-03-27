@@ -3,14 +3,22 @@ import Head from 'next/head'
 import Link from 'next/link'
 import {default as config} from "../lib/utils/config";
 import useSWR from 'swr'
+import * as cookie from "../lib/utils/cookie";
 
 import "@fontsource/lato";
 import "@fontsource/roboto";
 import {Fetcher} from "../lib/utils/fetcher";
 import Logout from "./logout";
 import {IsAuthenticated} from "../lib/hooks/auth";
+import {useEffect} from "react";
 
 export default function Layout({children, home}) {
+    const [session, setSession] = React.useState();
+
+    useEffect(() => {
+        setSession(cookie.GetCookie("session"));
+    }, []);
+
     return (
         <div>
             <Head>
@@ -23,7 +31,7 @@ export default function Layout({children, home}) {
                 <meta name="og:title" content={config.SiteTitle}/>
             </Head>
 
-            {IsAuthenticated()
+            {session
                 ? (
                     <div>
                         <Link href="/profile">
@@ -43,6 +51,7 @@ export default function Layout({children, home}) {
                         </Link>
                     </div>
                 )}
+
             <main>{children}</main>
             <br/>
 

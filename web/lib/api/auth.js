@@ -33,4 +33,19 @@ export const AuthAPI = {
             return error.response;
         }
     },
+    Logout: async() => {
+        try {
+            const response = await axios.post(
+                '/api/auth/logout',
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+            return response;
+        } catch (error) {
+            return error.response;
+        }
+    },
 }

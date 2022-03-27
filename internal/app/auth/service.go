@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/dgraph-io/badger/v3"
+	"github.com/elga-io/borzoi/internal/pkg/session"
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
@@ -33,7 +34,7 @@ func NewService(db *gorm.DB, cache *badger.DB) Service {
 func (s service) Logout(ctx context.Context, token string) (err error) {
 	l := log.Ctx(ctx)
 
-	key := fmt.Sprintf("auth/tokens/%s", token)
+	key := fmt.Sprintf(session.DBKey, token)
 	err = s.cache.Update(func(txn *badger.Txn) (err error) {
 		_, err = txn.Get([]byte(key))
 

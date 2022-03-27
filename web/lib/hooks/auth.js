@@ -1,8 +1,11 @@
+import * as cookie from "../utils/cookie";
+
 export function IsAuthenticated() {
     if (typeof document !== "undefined") {
-        let cookies = document.cookie;
-        let session = cookies.split("=")[0];
-        return session !== undefined;
+        let session = cookie.GetCookie("session")
+        if (session === null || session === "") {
+            return false;
+        }
     }
-    return false;
+    return true;
 }

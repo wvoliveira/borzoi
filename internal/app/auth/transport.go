@@ -34,6 +34,7 @@ func (s service) HTTPLogout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Answer request.
 	err = encodeLogout(w)
 	if err != nil {
 		l.Error().Caller().Msg(fmt.Sprintf("encode logout: %s", err.Error()))

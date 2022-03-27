@@ -13,10 +13,9 @@ export default function Register() {
     };
 
     return (
-        <Layout register>
+        <Layout>
             Register
-            <br/>
-            <br/>
+            <br/><br/>
 
             Name: <input /><br/>
             Email: <input/><br/>

@@ -57,11 +57,17 @@ func (m Middleware) Auth(next http.Handler) http.Handler {
 			return
 		}
 
-		key := fmt.Sprintf(session.CacheKey, cookie.Value)
+		key := fmt.Sprintf(session.DBKey, cookie.Value)
+		l.Debug().Caller().Msg(fmt.Sprintf("key: %s", key))
+
 		userID, err := session.UserGetIDFromSession(r.Context(), m.Cache, []byte(key))
 		if err != nil {
+			if errors.Is(err, badger.ErrKeyNotFound) {
+				e.EncodeError(w, e.ErrAuthUnauthorized)
+			} else {
+				e.EncodeError(w, err)
+			}
 			l.Error().Caller().Msg(err.Error())
-			e.EncodeError(w, err)
 			return
 		}
 

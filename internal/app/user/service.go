@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/dgraph-io/badger/v3"
 	"github.com/elga-io/borzoi/internal/pkg/entity"
@@ -78,6 +79,9 @@ func (s service) FindMe(ctx context.Context, userID string) (user entity.User, e
 	userDB := entity.User{}
 	err = s.db.Model(&userDB).Preload("Identities").Where("id = ?", userID).Find(&userDB).Error
 	if err != nil {
+		if errors.Is(err, badger.ErrKeyNotFound) {
+			return user, e.ErrAuthUnauthorized
+		}
 		l.Error().Caller().Msg(err.Error())
 		return
 	}

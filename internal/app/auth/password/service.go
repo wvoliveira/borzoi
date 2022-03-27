@@ -85,7 +85,7 @@ func (s service) Login(ctx context.Context, identity entity.Identity) (token str
 	}
 
 	token = uuid.New().String()
-	key := fmt.Sprintf(session.CacheKey, token)
+	key := fmt.Sprintf(session.DBKey, token)
 
 	err = s.cache.Update(func(txn *badger.Txn) (err error) {
 		ee := badger.NewEntry([]byte(key), []byte(user.ID)).WithTTL(time.Hour * 12)

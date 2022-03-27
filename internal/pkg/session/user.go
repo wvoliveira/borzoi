@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	CacheKey = "sessions/%s"
+	DBKey = "sessions/%s"
 )
 
 // UserGetIDFromContext get user struct from context.
@@ -31,7 +31,7 @@ func UserGetIDFromSession(ctx context.Context, db *badger.DB, key []byte) (userI
 
 		err = item.Value(func(val []byte) (err error) {
 			userID = string(val)
-			l.Debug().Caller().Msg(fmt.Sprintf("user_id from cache: %s", userID))
+			l.Debug().Caller().Msg(fmt.Sprintf("user_id from nosql: %s", userID))
 			return
 		})
 		return
