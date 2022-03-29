@@ -12,12 +12,15 @@ type Client struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 
-	Name   string `json:"name"`
-	Active string `json:"active"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Score       int    `json:"score"`
+	Active      string `json:"active"`
 
-	Phones []Phone `json:"-"`
-	Emails []Email `json:"-"`
-	Notes  []Note  `json:"-"`
+	Addresses []Address `json:"-" gorm:"many2many:client_addresses;"`
+	Phones    []Phone   `json:"-"`
+	Emails    []Email   `json:"-"`
+	Notes     []Note    `json:"-"`
 
 	// Relationship with User model.
 	UserID string `json:"user_id"`
@@ -77,6 +80,32 @@ type Note struct {
 }
 
 func (n *Note) BeforeCreate(_ *gorm.DB) (err error) {
+	n.ID = uuid.New().String()
+	return
+}
+
+// Address an address for client or any entity.
+type Address struct {
+	ID        string    `json:"id" gorm:"primaryKey;autoIncrement:false"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+
+	Country    string `json:"country"`
+	Name       string `json:"name"`
+	Phone      string `json:"phone"`
+	CEP        int    `json:"cep"`
+	Street     string `json:"street"`
+	Number     int    `json:"number"`
+	Complement string `json:"complement"`
+	District   string `json:"district"`
+	City       string `json:"city"`
+	State      string `json:"state"`
+
+	// Back-reference with Client model.
+	Clients []*Client `json:"-" gorm:"many2many:client_addresses;"`
+}
+
+func (n *Address) BeforeCreate(_ *gorm.DB) (err error) {
 	n.ID = uuid.New().String()
 	return
 }
