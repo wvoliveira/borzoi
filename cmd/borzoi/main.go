@@ -21,6 +21,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"strings"
 	"syscall"
 	"time"
@@ -35,6 +36,8 @@ import (
 var nextFS embed.FS
 
 func main() {
+	fMigrate := flag.Bool("migrate", false, "Enable GORM migration")
+
 	flag.Parse()
 
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
@@ -46,12 +49,18 @@ func main() {
 
 	distFS, err := fs.Sub(nextFS, "web")
 	if err != nil {
-		log.Fatal().Msg(err.Error())
+		log.Fatal().Caller().Msg(err.Error())
+	}
+
+	// Create database and cache folder in $HOME/.borzoi path.
+	folder, err := createDataFolder(".borzoi")
+	if err != nil {
+		panic(err)
 	}
 
 	cfg := config.NewConfig()
-	db := database.NewSQLDatabase("sqlite", "./.db/data")
-	cache := database.NewNoSQLDatabase("badger", "./.db/cache")
+	db := database.NewSQLDatabase("sqlite", filepath.Join(folder, "data"))
+	cache := database.NewNoSQLDatabase("badger", filepath.Join(folder, "cache"))
 
 	if *fMigrate {
 		err = db.AutoMigrate(
@@ -128,6 +137,24 @@ func main() {
 		log.Error().Msg(fmt.Sprintf("server forced to shutdown: %s", err.Error()))
 	}
 	log.Info().Msg("server exiting")
+}
+
+func createDataFolder(name string) (folder string, err error) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return
+	}
+
+	folder = filepath.Join(home, name)
+	if _, err = os.Stat(folder); os.IsNotExist(err) {
+		err = os.Mkdir(folder, os.ModePerm)
+		if err != nil {
+			return
+		}
+	} else if err != nil {
+		return
+	}
+	return
 }
 
 func printRoutes(rs []*mux.Router) {
