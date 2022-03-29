@@ -1,7 +1,6 @@
 package client
 
 import (
-	"fmt"
 	"github.com/elga-io/borzoi/internal/pkg/entity"
 	"github.com/elga-io/borzoi/internal/pkg/response"
 	"net/http"
@@ -9,8 +8,6 @@ import (
 
 // GET /v1/clients
 func encodeFindAll(w http.ResponseWriter, clients []entity.Client) (err error) {
-	fmt.Println("clients")
-	fmt.Println(clients)
 	response.Normal(w, clients, "", http.StatusOK)
 	return
 }

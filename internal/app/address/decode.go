@@ -1,4 +1,4 @@
-package client
+package address
 
 import (
 	"encoding/json"
@@ -15,10 +15,10 @@ import (
 )
 
 // GET /v1/clients
-func decodeFindAll(r *http.Request) (search string, page, limit int, err error) {
+func decodeFindAll(r *http.Request) (search, clientID string, page, limit int, err error) {
 	params := r.URL.Query()
-	paramSearch := params.Get("q")
-	search = strings.TrimSpace(paramSearch)
+	search = strings.TrimSpace(params.Get("q"))
+	clientID = strings.TrimSpace(params.Get("client_id"))
 
 	paramPage := params.Get("page")
 	if paramPage == "" {

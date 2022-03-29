@@ -6,6 +6,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/elga-io/borzoi/internal/app/address"
 	"github.com/elga-io/borzoi/internal/app/auth"
 	"github.com/elga-io/borzoi/internal/app/auth/password"
 	"github.com/elga-io/borzoi/internal/app/client"
@@ -100,6 +101,9 @@ func main() {
 
 	clientService := client.NewService(db, cache)
 	clientService.HTTPNew(apiRouter)
+
+	addressService := address.NewService(db, cache)
+	addressService.HTTPNew(apiRouter)
 
 	webHandler := http.FileServer(http.FS(distFS))
 	webRouter.PathPrefix("").Handler(webHandler)

@@ -1,4 +1,4 @@
-package client
+package address
 
 import (
 	"context"
@@ -15,7 +15,7 @@ import (
 
 // Service encapsulates the link service logic, http handlers and another transport layer.
 type Service interface {
-	FindAll(ctx context.Context, search string, page, limit int) (clients []entity.Client, err error)
+	FindAll(ctx context.Context, search, clientID string, page, limit int) (addresses []entity.Address, err error)
 	FindByID(ctx context.Context, id string) (client entity.Client, err error)
 	Update(ctx context.Context, id string, payload entity.Client) (link entity.Client, err error)
 	Delete(ctx context.Context, id string, delete bool) (link entity.Client, err error)
@@ -38,7 +38,7 @@ func NewService(db *gorm.DB, cache *badger.DB) Service {
 }
 
 // FindAll get a list of clients.
-func (s service) FindAll(ctx context.Context, search string, page, limit int) (clients []entity.Client, err error) {
+func (s service) FindAll(ctx context.Context, search, clientID string, page, limit int) (addresses []entity.Address, err error) {
 	l := log.Ctx(ctx)
 	userID := session.UserGetIDFromContext(ctx)
 
@@ -47,7 +47,7 @@ func (s service) FindAll(ctx context.Context, search string, page, limit int) (c
 		offset = page * limit
 	}
 
-	query := s.db.Model(&entity.Client{}).
+	query := s.db.Model(&entity.Address{}).
 		Debug().
 		Limit(limit).
 		Offset(offset)
@@ -56,11 +56,15 @@ func (s service) FindAll(ctx context.Context, search string, page, limit int) (c
 		query = query.Where("name LIKE ?", fmt.Sprintf("%[1]s%s%[1]s", "%", search))
 	}
 
-	err = query.Where("user_id = ?", userID).Find(&clients).Error
+	if clientID != "" {
+		query = query.Where("client_id = ?", clientID)
+	}
 
-	if len(clients) == 0 {
+	err = query.Where("user_id = ?", userID).Association("Clients").Find(&addresses)
+
+	if len(addresses) == 0 {
 		l.Warn().Caller().Msg(fmt.Sprintf("clients with search=%s limit=%d offset=%d was not found", search, limit, offset))
-		return clients, nil
+		return addresses, nil
 	}
 	if err != nil {
 		l.Error().Caller().Msg(err.Error())

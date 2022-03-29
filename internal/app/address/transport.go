@@ -1,4 +1,4 @@
-package client
+package address
 
 import (
 	"github.com/elga-io/borzoi/internal/pkg/entity"
@@ -20,19 +20,19 @@ func (s service) HTTPNew(r *mux.Router) {
 }
 
 func (s service) HTTPFindAll(w http.ResponseWriter, r *http.Request) {
-	search, page, limit, err := decodeFindAll(r)
+	search, clientID, page, limit, err := decodeFindAll(r)
 	if err != nil {
 		e.EncodeError(w, err)
 		return
 	}
 
-	clients, err := s.FindAll(r.Context(), search, page, limit)
+	addresses, err := s.FindAll(r.Context(), search, clientID, page, limit)
 	if err != nil {
 		e.EncodeError(w, err)
 		return
 	}
 
-	err = encodeFindAll(w, clients)
+	err = encodeFindAll(w, addresses)
 	if err != nil {
 		e.EncodeError(w, err)
 		return
