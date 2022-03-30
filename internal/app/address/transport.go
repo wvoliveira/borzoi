@@ -1,7 +1,6 @@
 package address
 
 import (
-	"github.com/elga-io/borzoi/internal/pkg/entity"
 	m "github.com/elga-io/borzoi/internal/pkg/middleware"
 	e "github.com/elga-io/canideos/errors"
 	"github.com/gorilla/mux"
@@ -14,9 +13,9 @@ func (s service) HTTPNew(r *mux.Router) {
 
 	rr.HandleFunc("", s.HTTPFindAll).Methods("GET")
 	rr.HandleFunc("", s.HTTPCreate).Methods("POST")
-	rr.HandleFunc("/{address_id}", s.HTTPFindByID).Methods("GET")
-	rr.HandleFunc("/{address_id}", s.HTTPUpdate).Methods("PATCH")
-	rr.HandleFunc("/{address_id}", s.HTTPDelete).Methods("DELETE")
+	rr.HandleFunc("/{id}", s.HTTPFindByID).Methods("GET")
+	rr.HandleFunc("/{id}", s.HTTPUpdate).Methods("PATCH")
+	rr.HandleFunc("/{id}", s.HTTPDelete).Methods("DELETE")
 }
 
 func (s service) HTTPFindAll(w http.ResponseWriter, r *http.Request) {
@@ -41,13 +40,13 @@ func (s service) HTTPFindAll(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s service) HTTPCreate(w http.ResponseWriter, r *http.Request) {
-	client, err := decodeCreate(r)
+	address, err := decodeCreate(r)
 	if err != nil {
 		e.EncodeError(w, err)
 		return
 	}
 
-	err = s.Create(r.Context(), client)
+	err = s.Create(r.Context(), address)
 	if err != nil {
 		e.EncodeError(w, err)
 		return
@@ -83,19 +82,19 @@ func (s service) HTTPFindByID(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s service) HTTPUpdate(w http.ResponseWriter, r *http.Request) {
-	req, err := decodeUpdate(r)
+	address, err := decodeUpdate(r)
 	if err != nil {
 		e.EncodeError(w, err)
 		return
 	}
 
-	l, err := s.Update(r.Context(), req.ID, entity.Client{Name: req.Name})
+	address, err = s.Update(r.Context(), address)
 	if err != nil {
 		e.EncodeError(w, err)
 		return
 	}
 
-	err = encodeUpdate(w, l)
+	err = encodeUpdate(w, address)
 	if err != nil {
 		e.EncodeError(w, err)
 		return
@@ -104,19 +103,19 @@ func (s service) HTTPUpdate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s service) HTTPDelete(w http.ResponseWriter, r *http.Request) {
-	id, del, err := decodeDelete(r)
+	id, clientID, err := decodeDelete(r)
 	if err != nil {
 		e.EncodeError(w, err)
 		return
 	}
 
-	client, err := s.Delete(r.Context(), id, del)
+	address, err := s.Delete(r.Context(), id, clientID)
 	if err != nil {
 		e.EncodeError(w, err)
 		return
 	}
 
-	err = encodeDelete(w, client)
+	err = encodeDelete(w, address)
 	if err != nil {
 		e.EncodeError(w, err)
 		return

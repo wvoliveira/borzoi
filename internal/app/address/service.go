@@ -17,8 +17,8 @@ import (
 type Service interface {
 	FindAll(ctx context.Context, search, clientID string, page, limit int) (addresses []entity.Address, err error)
 	FindByID(ctx context.Context, id string) (client entity.Client, err error)
-	Update(ctx context.Context, id string, payload entity.Client) (link entity.Client, err error)
-	Delete(ctx context.Context, id string, delete bool) (link entity.Client, err error)
+	Update(ctx context.Context, payload entity.Address) (address entity.Address, err error)
+	Delete(ctx context.Context, id, clientID string) (address entity.Address, err error)
 
 	HTTPNew(r *mux.Router)
 	HTTPFindAll(w http.ResponseWriter, r *http.Request)
@@ -57,10 +57,15 @@ func (s service) FindAll(ctx context.Context, search, clientID string, page, lim
 	}
 
 	if clientID != "" {
-		query = query.Where("client_id = ?", clientID)
+		err = query.Where("user_id = ? AND client_id = ?", userID, clientID).Association("Clients").Error
+	} else {
+		err = s.db.Model(addresses).
+			Debug().
+			Limit(limit).
+			Offset(offset).
+			Preload("Clients").
+			Find(&addresses).Error
 	}
-
-	err = query.Where("user_id = ?", userID).Association("Clients").Find(&addresses)
 
 	if len(addresses) == 0 {
 		l.Warn().Caller().Msg(fmt.Sprintf("clients with search=%s limit=%d offset=%d was not found", search, limit, offset))
@@ -73,14 +78,13 @@ func (s service) FindAll(ctx context.Context, search, clientID string, page, lim
 	return
 }
 
-// Create add a new client.
-func (s service) Create(ctx context.Context, client entity.Client) (err error) {
+// Create add a new address.
+func (s service) Create(ctx context.Context, address entity.Address) (err error) {
 	l := log.Ctx(ctx)
 	userID := session.UserGetIDFromContext(ctx)
-	client.UserID = userID
-	client.Active = "true"
+	address.UserID = userID
 
-	err = s.db.Model(&client).Create(&client).Error
+	err = s.db.Debug().Model(&address).Create(&address).Save(&address).Error
 	if err != nil {
 		l.Error().Caller().Msg(err.Error())
 	}
@@ -105,42 +109,43 @@ func (s service) FindByID(ctx context.Context, id string) (client entity.Client,
 	return
 }
 
-// Update change specific client by ID.
-func (s service) Update(ctx context.Context, id string, payload entity.Client) (client entity.Client, err error) {
+// Update change specific address by ID.
+func (s service) Update(ctx context.Context, address entity.Address) (entity.Address, error) {
 	l := log.Ctx(ctx)
 	userID := session.UserGetIDFromContext(ctx)
+	address.UserID = userID
 
-	err = s.db.Model(&entity.User{}).Where("user_id = ?", userID).Where("id = ?", id).Updates(&payload).Error
+	err := s.db.Debug().Create(&address).Save(&address).Error
+
 	if err == gorm.ErrRecordNotFound {
-		l.Info().Caller().Msg(fmt.Sprintf("the client with id '%s' was not found", id))
-		return client, e.ErrUserNotFound
+		l.Info().Caller().Msg(fmt.Sprintf("the address with id '%s' and user_id '%s' was not found", address.ID, userID))
+		return address, e.ErrUserNotFound
 	}
 
 	if err != nil {
 		l.Error().Caller().Msg(err.Error())
-		return
+		return address, err
 	}
-	client = payload
-	return
+	return address, nil
 }
 
-// Delete disable or delete a specific client by ID.
-func (s service) Delete(ctx context.Context, id string, delete bool) (client entity.Client, err error) {
+// Delete disable or delete a specific address by ID.
+func (s service) Delete(ctx context.Context, id, clientID string) (address entity.Address, err error) {
 	l := log.Ctx(ctx)
 	userID := session.UserGetIDFromContext(ctx)
-	client.ID = id
-	client.UserID = userID
+	address.ID = id
+	address.UserID = userID
 
-	if delete {
-		err = s.db.Model(&client).Find(&client).Delete(&client).Error
+	if clientID != "" {
+		client := entity.Client{ID: clientID}
+		err = s.db.Model(&address).Association("Clients").Delete(client)
 	} else {
-		client.Active = "false"
-		err = s.db.Model(&client).Updates(&client).Find(&client).Error
+		err = s.db.Model(&address).Find(&address).Delete(&address).Error
 	}
 
 	if err == gorm.ErrRecordNotFound {
-		l.Info().Caller().Msg(fmt.Sprintf("the client with id '%s' was not found", id))
-		return client, e.ErrUserNotFound
+		l.Info().Caller().Msg(fmt.Sprintf("the address with id '%s' was not found", id))
+		return address, e.ErrUserNotFound
 	}
 
 	if err != nil {
