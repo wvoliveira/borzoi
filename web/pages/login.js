@@ -1,23 +1,12 @@
-import React, { useState } from "react";
-import useUser from "../lib/iron/useUser";
+import React from "react";
 import Layout from "../components/Layout";
-import Form from "../components/Form";
-import fetchJson, { FetchError } from "../lib/iron/fetchJson";
 import FormLogin from "../components/FormLogin";
 
 export default function Login() {
-    // here we just check if user is already logged in and redirect to profile
-    const { mutateUser } = useUser({
-        redirectTo: "/profile",
-        redirectIfFound: true,
-    });
-
-    const [errorMsg, setErrorMsg] = useState("");
-
     return (
         <Layout>
             <div className="login">
-                <FormLogin />
+                <FormLogin/>
             </div>
             <style jsx>{`
         .login {

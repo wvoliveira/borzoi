@@ -1,25 +1,23 @@
 import * as React from "react";
-import Layout from "../components/layout";
+import Layout from "../components/Layout";
+import FormRegister from "../components/FormRegister";
 
 export default function Register() {
 
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        const data = new FormData(event.currentTarget);
-        console.log({
-            email: data.get('email'),
-            password: data.get('password'),
-        });
-    };
-
     return (
         <Layout>
-            Register
-            <br/><br/>
-
-            Name: <input /><br/>
-            Email: <input/><br/>
-            Password: <input/><br/>
+            <div className="login">
+                <FormRegister/>
+            </div>
+            <style jsx>{`
+        .login {
+          max-width: 21rem;
+          margin: 0 auto;
+          padding: 1rem;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+        }
+      `}</style>
         </Layout>
-    )
+    );
 }

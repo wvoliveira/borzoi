@@ -2,7 +2,6 @@ import Router, {useRouter} from "next/router";
 import React from "react";
 
 import {AuthAPI} from "../lib/api/auth";
-import {IsAuthenticated} from "../lib/hooks/auth";
 import useUser from "../lib/iron/useUser";
 
 export default function FormLogin() {
@@ -24,12 +23,6 @@ export default function FormLogin() {
         (e) => setPassword(e.target.value),
         []
     );
-
-    const router = useRouter()
-
-    if (IsAuthenticated()) {
-        typeof window !== 'undefined' && router.push("/");
-    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();

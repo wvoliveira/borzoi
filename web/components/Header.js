@@ -2,7 +2,6 @@ import Link from "next/link";
 import useUser from "../lib/iron/useUser";
 import {useRouter} from "next/router";
 import Image from "next/image";
-import fetchJson from "../lib/iron/fetchJson";
 import {AuthAPI} from "../lib/api/auth";
 
 export default function Header() {
@@ -17,11 +16,19 @@ export default function Header() {
                         <a>Home</a>
                     </Link>
                 </li>
-                {!user && (<li>
-                    <Link href="/login">
-                        <a>Login</a>
-                    </Link>
-                </li>)}
+                {!user && (<>
+                        <li>
+                            <Link href="/login">
+                                <a>Login</a>
+                            </Link>
+                        </li>
+                        <li>
+                            <Link href="/register">
+                                <a>Register</a>
+                            </Link>
+                        </li>
+                    </>
+                )}
                 {user?.status === "successful" && (<>
                     <li>
                         <Link href="/profile">
@@ -32,11 +39,11 @@ export default function Header() {
                         }}
                     >
                       {/*<Image*/}
-                      {/*    src={user.avatarUrl}*/}
-                      {/*    width={32}*/}
-                      {/*    height={32}*/}
-                      {/*    alt=""*/}
-                      {/*/>*/}
+                        {/*    src={user.avatarUrl}*/}
+                        {/*    width={32}*/}
+                        {/*    height={32}*/}
+                        {/*    alt=""*/}
+                        {/*/>*/}
                     </span>
                                 Profile (Static Generation, recommended)
                             </a>
