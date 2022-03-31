@@ -3,8 +3,14 @@ import React from "react";
 
 import {AuthAPI} from "../lib/api/auth";
 import {IsAuthenticated} from "../lib/hooks/auth";
+import useUser from "../lib/iron/useUser";
 
 export default function FormLogin() {
+    const { mutateUser } = useUser({
+        redirectTo: "/profile",
+        redirectIfFound: true,
+    });
+
     const [isLoading, setLoading] = React.useState(false);
     const [errors, setErrors] = React.useState([]);
     const [email, setEmail] = React.useState("");
@@ -40,6 +46,7 @@ export default function FormLogin() {
             }
 
             if (status === 200) {
+                mutateUser(data)
                 Router.push("/");
             }
         } catch (error) {
