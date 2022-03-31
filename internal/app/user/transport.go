@@ -2,9 +2,9 @@ package user
 
 import (
 	"github.com/elga-io/borzoi/internal/pkg/entity"
+	e "github.com/elga-io/borzoi/internal/pkg/errors"
 	m "github.com/elga-io/borzoi/internal/pkg/middleware"
 	res "github.com/elga-io/borzoi/internal/pkg/response"
-	e "github.com/elga-io/canideos/errors"
 	"github.com/gorilla/mux"
 	"net/http"
 )

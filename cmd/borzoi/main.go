@@ -12,9 +12,9 @@ import (
 	"github.com/elga-io/borzoi/internal/app/client"
 	"github.com/elga-io/borzoi/internal/app/user"
 	"github.com/elga-io/borzoi/internal/pkg/config"
+	"github.com/elga-io/borzoi/internal/pkg/database"
 	"github.com/elga-io/borzoi/internal/pkg/entity"
 	"github.com/elga-io/borzoi/internal/pkg/middleware"
-	"github.com/elga-io/canideos/database"
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -30,10 +30,10 @@ import (
 
 //const version = "0.0.0"
 
-////go:embed web
-////go:embed web/_next/static
-////go:embed web/_next/static/chunks/pages/*.js
-////go:embed web/_next/static/*/*.js
+//go:embed web
+//go:embed web/_next/static
+//go:embed web/_next/static/chunks/pages/*.js
+//go:embed web/_next/static/*/*.js
 var nextFS embed.FS
 
 func main() {

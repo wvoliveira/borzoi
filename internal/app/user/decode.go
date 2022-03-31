@@ -3,8 +3,8 @@ package user
 import (
 	"encoding/json"
 	"errors"
+	e "github.com/elga-io/borzoi/internal/pkg/errors"
 	"github.com/elga-io/borzoi/internal/pkg/session"
-	e "github.com/elga-io/canideos/errors"
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog/log"
 	"io/ioutil"

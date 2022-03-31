@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {createTheme, ThemeProvider} from '@mui/material/styles';
 import { SWRConfig } from "swr";
-import fetchJson from "../lib/iron/fetchJson";
+import fetchJson from "../lib/utils/fetchJson";
 
 const theme = createTheme({});
 

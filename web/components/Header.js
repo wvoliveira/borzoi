@@ -1,7 +1,6 @@
 import Link from "next/link";
-import useUser from "../lib/iron/useUser";
+import useUser from "../lib/utils/useUser";
 import {useRouter} from "next/router";
-import Image from "next/image";
 import {AuthAPI} from "../lib/api/auth";
 
 export default function Header() {
@@ -38,12 +37,6 @@ export default function Header() {
                             marginRight: ".3em", verticalAlign: "middle", borderRadius: "100%", overflow: "hidden",
                         }}
                     >
-                      {/*<Image*/}
-                        {/*    src={user.avatarUrl}*/}
-                        {/*    width={32}*/}
-                        {/*    height={32}*/}
-                        {/*    alt=""*/}
-                        {/*/>*/}
                     </span>
                                 Profile (Static Generation, recommended)
                             </a>
@@ -65,16 +58,6 @@ export default function Header() {
                         </a>
                     </li>
                 </>)}
-                <li>
-                    <a href="https://github.com/vvo/iron-session">
-                        <Image
-                            src="/GitHub-Mark-Light-32px.png"
-                            width="32"
-                            height="32"
-                            alt=""
-                        />
-                    </a>
-                </li>
             </ul>
         </nav>
         <style jsx>{`

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/elga-io/borzoi/internal/pkg/entity"
-	e "github.com/elga-io/canideos/errors"
+	e "github.com/elga-io/borzoi/internal/pkg/errors"
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog/log"
 	"io"

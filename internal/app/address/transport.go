@@ -1,8 +1,8 @@
 package address
 
 import (
+	e "github.com/elga-io/borzoi/internal/pkg/errors"
 	m "github.com/elga-io/borzoi/internal/pkg/middleware"
-	e "github.com/elga-io/canideos/errors"
 	"github.com/gorilla/mux"
 	"net/http"
 )

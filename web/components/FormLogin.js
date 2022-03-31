@@ -2,7 +2,7 @@ import Router, {useRouter} from "next/router";
 import React from "react";
 
 import {AuthAPI} from "../lib/api/auth";
-import useUser from "../lib/iron/useUser";
+import useUser from "../lib/utils/useUser";
 
 export default function FormLogin() {
     const { mutateUser } = useUser({
