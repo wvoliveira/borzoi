@@ -23,7 +23,6 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
-	"strings"
 	"syscall"
 	"time"
 )
@@ -82,13 +81,8 @@ func main() {
 	router.Use(mw.CorrelationID)
 	router.Use(mw.Log)
 
-	webRouter := router.MatcherFunc(func(req *http.Request, match *mux.RouteMatch) bool {
-		return req.RequestURI == "/" ||
-			strings.HasPrefix(req.RequestURI, "/_next") ||
-			req.RequestURI == "/favicon.ico"
-	}).Subrouter().StrictSlash(true)
-
 	apiRouter := router.PathPrefix("/api").Subrouter().StrictSlash(true)
+	webRouter := router.PathPrefix("/").Subrouter().StrictSlash(true)
 
 	authService := auth.NewService(db, cache)
 	authService.HTTPNew(apiRouter)
