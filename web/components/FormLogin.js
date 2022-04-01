@@ -1,11 +1,12 @@
-import Router, {useRouter} from "next/router";
+import Router from "next/router";
 import React from "react";
 
 import {AuthAPI} from "../lib/api/auth";
 import useUser from "../lib/utils/useUser";
+import {Box, TextField} from "@mui/material";
 
 export default function FormLogin() {
-    const { mutateUser } = useUser({
+    const {mutateUser} = useUser({
         redirectTo: "/profile",
         redirectIfFound: true,
     });
@@ -51,8 +52,10 @@ export default function FormLogin() {
 
     return (
         <form onSubmit={handleSubmit}>
-            Email:{" "}
-            <input
+            <TextField
+                id="email"
+                label="Email"
+                variant="outlined"
                 name="email"
                 type="email"
                 placeholder="Email"
@@ -60,8 +63,10 @@ export default function FormLogin() {
                 onChange={handleEmailChange}
             />
             <br/>
-            Password:{" "}
-            <input
+            <TextField
+                id="password"
+                label="Password"
+                variant="outlined"
                 name="password"
                 type="password"
                 placeholder="Password"

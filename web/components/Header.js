@@ -1,127 +1,190 @@
+import * as React from 'react';
+import {styled, useTheme} from '@mui/material/styles';
+import Box from '@mui/material/Box';
+import MuiDrawer from '@mui/material/Drawer';
+import MuiAppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import CssBaseline from '@mui/material/CssBaseline';
+import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
 import useUser from "../lib/utils/useUser";
 import {useRouter} from "next/router";
 import {AuthAPI} from "../lib/api/auth";
-import * as React from 'react';
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
-import HomeIcon from '@mui/icons-material/Home';
-import Container from '@mui/material/Container';
-import {Link} from "@mui/material";
+import {Button, Link, Menu, MenuItem, Tooltip} from "@mui/material";
+import {AccountCircle} from "@mui/icons-material";
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+
+const drawerWidth = 240;
+
+const openedMixin = (theme) => ({
+    width: drawerWidth,
+    transition: theme.transitions.create('width', {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.enteringScreen,
+    }),
+    overflowX: 'hidden',
+});
+
+const closedMixin = (theme) => ({
+    transition: theme.transitions.create('width', {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+    }),
+    overflowX: 'hidden',
+    width: `calc(${theme.spacing(7)} + 1px)`,
+    [theme.breakpoints.up('sm')]: {
+        width: `calc(${theme.spacing(8)} + 1px)`,
+    },
+});
+
+const DrawerHeader = styled('div')(({theme}) => ({
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    padding: theme.spacing(0, 1),
+    // necessary for content to be below app bar
+    ...theme.mixins.toolbar,
+}));
+
+const AppBar = styled(MuiAppBar, {
+    shouldForwardProp: (prop) => prop !== 'open',
+})(({theme, open}) => ({
+    zIndex: theme.zIndex.drawer + 1,
+    transition: theme.transitions.create(['width', 'margin'], {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+    }),
+    ...(open && {
+        marginLeft: drawerWidth,
+        width: `calc(100% - ${drawerWidth}px)`,
+        transition: theme.transitions.create(['width', 'margin'], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+        }),
+    }),
+}));
+
+const Drawer = styled(MuiDrawer, {shouldForwardProp: (prop) => prop !== 'open'})(
+    ({theme, open}) => ({
+        width: drawerWidth,
+        flexShrink: 0,
+        whiteSpace: 'nowrap',
+        boxSizing: 'border-box',
+        ...(open && {
+            ...openedMixin(theme),
+            '& .MuiDrawer-paper': openedMixin(theme),
+        }),
+        ...(!open && {
+            ...closedMixin(theme),
+            '& .MuiDrawer-paper': closedMixin(theme),
+        }),
+    }),
+);
 
 export default function Header() {
     const {user, mutateUser} = useUser();
     const router = useRouter();
 
-    return (<header>
-        <Box sx={{flexGrow: 1}}>
-            <AppBar position="static">
-                <Container maxWidth="xl">
-                <Toolbar disableGutters>
-                    <Typography variant="h6" noWrap component="div" sx={{flexGrow: 1, display: { xs: 'flex'}}}>
-                            <a onClick={() => {router.push("/")}}>BORZOI</a>
-                    </Typography>
-                    {!user && (<>
-                        <Button onClick={() => {router.push("/login")}} color="inherit">Login</Button>
-                        <Button onClick={() => {router.push("/register")}} color="inherit">Register</Button>
-                    </>)}
-                    {user?.status === "successful" && (<>
-                        <Button onClick={() => {router.push("/profile")}} color="inherit">Profile</Button>
-                        <Button onClick={async (e) => {
-                            e.preventDefault();
-                            await AuthAPI.Logout();
-                            mutateUser(false);
-                            await router.push("/");
-                        }} color="inherit">Logout</Button>
-                    </>)}
-                </Toolbar>
-                </Container>
-            </AppBar>
-        </Box>
-    </header>)
-    //     <header>
-    //     <nav>
-    //         <ul>
-    //             <li>
-    //                 <Link href="/">
-    //                     <a>Home</a>
-    //                 </Link>
-    //             </li>
-    //             {!user && (<>
-    //                     <li>
-    //                         <Link href="/login">
-    //                             <a>Login</a>
-    //                         </Link>
-    //                     </li>
-    //                     <li>
-    //                         <Link href="/register">
-    //                             <a>Register</a>
-    //                         </Link>
-    //                     </li>
-    //                 </>
-    //             )}
-    //             {user?.status === "successful" && (<>
-    //                 <li>
-    //                     <Link href="/profile">
-    //                         <a>
-    //                 <span
-    //                     style={{
-    //                         marginRight: ".3em", verticalAlign: "middle", borderRadius: "100%", overflow: "hidden",
-    //                     }}
-    //                 >
-    //                 </span>
-    //                             Profile (Static Generation, recommended)
-    //                         </a>
-    //                     </Link>
-    //                 </li>
-    //                 <li>
-    //                     {/* In this case, we're fine with linking with a regular a in case of no JavaScript */}
-    //                     {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-    //                     <a
-    //                         href="/"
-    //                         onClick={async (e) => {
-    //                             e.preventDefault();
-    //                             await AuthAPI.Logout();
-    //                             mutateUser(false);
-    //                             await router.push("/login");
-    //                         }}
-    //                     >
-    //                         Logout
-    //                     </a>
-    //                 </li>
-    //             </>)}
-    //         </ul>
-    //     </nav>
-    //     <style jsx>{`
-    //     ul {
-    //       display: flex;
-    //       list-style: none;
-    //       margin-left: 0;
-    //       padding-left: 0;
-    //     }
-    //     li {
-    //       margin-right: 1rem;
-    //       display: flex;
-    //     }
-    //     li:first-child {
-    //       margin-left: auto;
-    //     }
-    //     a {
-    //       color: #fff;
-    //       text-decoration: none;
-    //       display: flex;
-    //       align-items: center;
-    //     }
-    //     a img {
-    //       margin-right: 1em;
-    //     }
-    //     header {
-    //       padding: 0.2rem;
-    //       color: #fff;
-    //       background-color: #333;
-    //     }
-    //   `}</style>
-    // </header>);
+    const theme = useTheme();
+    const [open, setOpen] = React.useState(false);
+
+    const [anchorElUser, setAnchorElUser] = React.useState(null);
+
+    const handleOpenUserMenu = (event) => {
+        setAnchorElUser(event.currentTarget);
+    };
+
+    const handleCloseUserMenu = () => {
+        setAnchorElUser(null);
+    };
+
+    const handleLogout = () => {
+        handleCloseUserMenu();
+        AuthAPI.Logout().then(mutateUser(null) && router.push("/"));
+    };
+
+    const handleDrawerOpen = () => {
+        setOpen(true);
+    };
+
+    const handleDrawerClose = () => {
+        setOpen(false);
+    };
+
+    return (
+        <header>
+            <Box sx={{display: 'flex'}}>
+                <CssBaseline/>
+                <AppBar color="inherit" position="fixed" open={open}>
+                    <Toolbar>
+
+                        <Typography variant="h6" noWrap component="div" sx={{flexGrow: 1}}>
+                            <Link underline="none" href="/"><a>BORZOI</a></Link>
+                        </Typography>
+
+                        {!user && (<>
+                            <Button onClick={() => {
+                                router.push("/login")
+                            }} color="inherit">Login</Button>
+                            <Button onClick={() => {
+                                router.push("/register")
+                            }} color="inherit">Register</Button>
+                        </>)}
+
+                        {user?.status === "successful" && (
+                            <Box sx={{flexGrow: 0}}>
+                                <Tooltip title="Open settings">
+                                    <IconButton size="large"
+                                                aria-label="account of current user"
+                                                aria-controls="primary-search-account-menu"
+                                                aria-haspopup="true"
+                                                color="inherit"
+                                                onClick={handleOpenUserMenu}
+                                                sx={{p: 0}}>
+                                        <AccountCircle fontSize="large"/>
+                                    </IconButton>
+                                </Tooltip>
+                                <IconButton
+                                    size="large"
+                                    aria-label="display more actions"
+                                    edge="end"
+                                    color="inherit"
+                                >
+                                    <MoreVertIcon/>
+                                </IconButton>
+                                <Menu
+                                    sx={{mt: '45px'}}
+                                    id="menu-appbar"
+                                    anchorEl={anchorElUser}
+                                    anchorOrigin={{
+                                        vertical: 'top',
+                                        horizontal: 'right',
+                                    }}
+                                    keepMounted
+                                    transformOrigin={{
+                                        vertical: 'top',
+                                        horizontal: 'right',
+                                    }}
+                                    open={Boolean(anchorElUser)}
+                                    onClose={handleCloseUserMenu}
+                                >
+                                    <MenuItem key="profile" onClick={() => {
+                                        router.push("/profile")
+                                    }}>
+                                        <Typography textAlign="center">Profile</Typography>
+                                    </MenuItem>
+                                    <MenuItem key="logout" onClick={handleLogout}>
+                                        <Typography textAlign="center">Logout</Typography>
+                                    </MenuItem>
+                                </Menu>
+                            </Box>
+                        )}
+
+                    </Toolbar>
+                </AppBar>
+                <Toolbar/>
+
+            </Box>
+        </header>
+    );
 }

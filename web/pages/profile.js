@@ -4,7 +4,7 @@ import useUser from "../lib/utils/useUser";
 import useEvents from "../lib/utils/useEvents";
 
 // Make sure to check https://nextjs.org/docs/basic-features/layouts for more info on how to use layouts
-export default function SgProfile() {
+export default function Profile() {
     const { user } = useUser({
         redirectTo: "/login",
     });

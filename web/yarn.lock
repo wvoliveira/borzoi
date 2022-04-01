@@ -231,10 +231,25 @@
   "resolved" "https://registry.npmjs.org/@emotion/weak-memoize/-/weak-memoize-0.2.5.tgz"
   "version" "0.2.5"
 
+"@fontsource/abel@^4.5.4":
+  "integrity" "sha512-Lj2aN+ItgzUeGDNkggOd5Mlex64/+vA5duFjAvfFCi+fHWe7N3ZPIu8RmuJnv/DwN6xwmQ5k1Or8HnN+NfJGUQ=="
+  "resolved" "https://registry.npmjs.org/@fontsource/abel/-/abel-4.5.4.tgz"
+  "version" "4.5.4"
+
+"@fontsource/inter@^4.5.7":
+  "integrity" "sha512-25k3thupaOEBexuU+jAkGqieKPbuhSuA+sinDwp1iBNhqQPiJ9QHDvsXgoCgCbZ4sGlE8aCwZmSlDJrPdJHNkw=="
+  "resolved" "https://registry.npmjs.org/@fontsource/inter/-/inter-4.5.7.tgz"
+  "version" "4.5.7"
+
 "@fontsource/lato@^4.5.5":
   "integrity" "sha512-0KVmVCq3wZnriKVdbY+n/ZLf7Vy+dQcqpcm8kaVX4QGd6uBTgH6YWLnM1L051TtjKlal2FiE6xc/BLw116a0gQ=="
   "resolved" "https://registry.npmjs.org/@fontsource/lato/-/lato-4.5.5.tgz"
   "version" "4.5.5"
+
+"@fontsource/open-sans@^4.5.8":
+  "integrity" "sha512-3b94XDdRLqL7OlE7OjWg/4pgG825Juw8PLVEDm6h5pio0gMU89ICxfatGxHsBxMGfqad+wnvdmUweZWlELDFpQ=="
+  "resolved" "https://registry.npmjs.org/@fontsource/open-sans/-/open-sans-4.5.8.tgz"
+  "version" "4.5.8"
 
 "@fontsource/roboto@^4.5.3":
   "integrity" "sha512-NUvBTj332dFRdiVkLlavXbDGoD2zyyeGYmMyrXOnctg/3e4pq95+rJgNfUP+k4v8UBk2L1aomGw9dDjbRdAmTg=="

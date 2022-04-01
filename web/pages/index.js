@@ -4,8 +4,6 @@ export default function Home() {
     return (
         <Layout>
             <h1>
-        <span style={{ marginRight: ".3em", verticalAlign: "middle" }}>
-        </span>
                 <a href="https://github.com/vvo/iron-session">iron-session</a> -
                 Authentication example
             </h1>
@@ -18,9 +16,9 @@ export default function Home() {
             <p>
                 It uses current best practices as for authentication in the Next.js
                 ecosystem:
-                <br />
+                <br/>
                 1. <b>no `getInitialProps`</b> to ensure every page is static
-                <br />
+                <br/>
                 2. <b>`useUser` hook</b> together with `
                 <a href="https://swr.now.sh/">swr`</a> for data fetching
             </p>
