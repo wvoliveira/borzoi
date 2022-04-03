@@ -1,8 +1,6 @@
 import Head from "next/head";
 import Header from "../components/Header";
 
-import Container from "@mui/material/Container";
-
 export default function Layout({children}) {
     return (
         <>
@@ -12,9 +10,8 @@ export default function Layout({children}) {
             <Header/>
 
             <main>
-                <Container maxWidth="md">
-                    <div>{children}</div>
-                </Container>
+                <br/>
+                <div>{children}</div>
             </main>
         </>
     );

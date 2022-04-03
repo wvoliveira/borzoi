@@ -67,13 +67,13 @@ func (s service) HTTPFindByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := s.FindByID(r.Context(), id)
+	address, err := s.FindByID(r.Context(), id)
 	if err != nil {
 		e.EncodeError(w, err)
 		return
 	}
 
-	err = encodeFindByID(w, user)
+	err = encodeFindByID(w, address)
 	if err != nil {
 		e.EncodeError(w, err)
 		return
@@ -82,19 +82,19 @@ func (s service) HTTPFindByID(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s service) HTTPUpdate(w http.ResponseWriter, r *http.Request) {
-	address, err := decodeUpdate(r)
+	id, action, address, clients, err := decodeUpdate(r)
 	if err != nil {
 		e.EncodeError(w, err)
 		return
 	}
 
-	address, err = s.Update(r.Context(), address)
+	err = s.Update(r.Context(), id, action, address, clients)
 	if err != nil {
 		e.EncodeError(w, err)
 		return
 	}
 
-	err = encodeUpdate(w, address)
+	err = encodeUpdate(w)
 	if err != nil {
 		e.EncodeError(w, err)
 		return
@@ -103,13 +103,13 @@ func (s service) HTTPUpdate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s service) HTTPDelete(w http.ResponseWriter, r *http.Request) {
-	id, clientID, err := decodeDelete(r)
+	id, err := decodeDelete(r)
 	if err != nil {
 		e.EncodeError(w, err)
 		return
 	}
 
-	address, err := s.Delete(r.Context(), id, clientID)
+	address, err := s.Delete(r.Context(), id)
 	if err != nil {
 		e.EncodeError(w, err)
 		return

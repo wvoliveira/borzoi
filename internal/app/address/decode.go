@@ -26,6 +26,30 @@ type CreateRequest struct {
 	State      string `json:"state"`
 }
 
+type UpdateRequest struct {
+	Action    string        `json:"action"`
+	Address   CreateRequest `json:"address"`
+	ClientIDs []string      `json:"client_ids"`
+}
+
+func (c CreateRequest) ToAddress() (addr entity.Address) {
+	c.Country = addr.Country
+	c.Name = addr.Name
+	c.Phone = addr.Phone
+	c.Street = addr.Street
+	c.Complement = addr.Complement
+	c.District = addr.District
+	c.City = addr.City
+	c.State = addr.State
+	if v, err := strconv.Atoi(c.CEP); err == nil {
+		addr.CEP = v
+	}
+	if v, err := strconv.Atoi(c.Number); err == nil {
+		addr.Number = v
+	}
+	return
+}
+
 // GET /v1/addresses
 func decodeFindAll(r *http.Request) (search, clientID string, page, limit int, err error) {
 	params := r.URL.Query()
@@ -57,32 +81,17 @@ func decodeFindAll(r *http.Request) (search, clientID string, page, limit int, e
 	return
 }
 
-// PUT /v1/addresses
-func decodeCreate(r *http.Request) (a entity.Address, err error) {
+// POST /v1/addresses
+func decodeCreate(r *http.Request) (addr entity.Address, err error) {
 	cq := CreateRequest{}
 	err = json.NewDecoder(r.Body).Decode(&cq)
 	if err == io.EOF {
-		return a, e.ErrClientBadRequest
+		return addr, e.ErrClientBadRequest
 	}
 	if err != nil {
 		return
 	}
-
-	a.Country = cq.Country
-	a.Name = cq.Name
-	a.Phone = cq.Phone
-	a.Street = cq.Street
-	a.Complement = cq.Complement
-	a.District = cq.District
-	a.City = cq.City
-	a.State = cq.State
-
-	if v, err := strconv.Atoi(cq.CEP); err == nil {
-		a.CEP = v
-	}
-	if v, err := strconv.Atoi(cq.Number); err == nil {
-		a.Number = v
-	}
+	addr = cq.ToAddress()
 	return
 }
 
@@ -97,39 +106,44 @@ func decodeFindByID(r *http.Request) (id string, err error) {
 }
 
 // PATCH /v1/addresses/{id}
-func decodeUpdate(r *http.Request) (address entity.Address, err error) {
+// Actions:
+// - empty: update only address
+// - append: append clients from address
+// - remove: remove clients from address
+func decodeUpdate(r *http.Request) (id, action string, addr entity.Address, clientIDs []string, err error) {
 	vars := mux.Vars(r)
-	id := vars["id"]
+	id = vars["id"]
 
 	if id == "" {
-		return address, errors.New("you must pass a id. Ex.: api/v1/addresses/123e4567-e89b-12d3-a456-426655440000")
+		return id, action, addr, clientIDs, errors.New("you must pass a id. Ex.: api/v1/addresses/<id>")
 	}
 
+	req := UpdateRequest{}
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		if err.Error() == "EOF" {
-			return address, errors.New("you must send a body for update the address")
+			return id, action, addr, clientIDs, errors.New("you must send a body for update the address")
 		}
 		if err != nil {
 			return
 		}
 	}
-	err = json.Unmarshal(body, &address)
+
+	err = json.Unmarshal(body, &req)
 	if err != nil {
 		return
 	}
-	return
+
+	addr = req.Address.ToAddress()
+	return id, req.Action, addr, req.ClientIDs, nil
 }
 
 // DELETE /v1/addresses/{id}
-func decodeDelete(r *http.Request) (id, clientID string, err error) {
+func decodeDelete(r *http.Request) (id string, err error) {
 	vars := mux.Vars(r)
 	id = vars["id"]
 	if id == "" {
-		return id, clientID, errors.New("you must pass a id. Ex.: api/v1/addresses/123e4567-e89b-12d3-a456-426655440000")
+		return id, errors.New("you must pass a id. Ex.: api/v1/addresses/<id>")
 	}
-
-	params := r.URL.Query()
-	clientID = strings.TrimSpace(params.Get("client_id"))
 	return
 }

@@ -15,10 +15,10 @@ import (
 
 // Service encapsulates the link service logic, http handlers and another transport layer.
 type Service interface {
-	FindAll(ctx context.Context, search, clientID string, page, limit int) (addresses []entity.Address, err error)
-	FindByID(ctx context.Context, id string) (client entity.Client, err error)
-	Update(ctx context.Context, payload entity.Address) (address entity.Address, err error)
-	Delete(ctx context.Context, id, clientID string) (address entity.Address, err error)
+	FindAll(ctx context.Context, search, clientID string, page, limit int) ([]entity.Address, error)
+	FindByID(ctx context.Context, id string) (address entity.Address, err error)
+	Update(ctx context.Context, id, action string, addr entity.Address, clientIDs []string) error
+	Delete(ctx context.Context, id string) (address entity.Address, err error)
 
 	HTTPNew(r *mux.Router)
 	HTTPFindAll(w http.ResponseWriter, r *http.Request)
@@ -57,12 +57,13 @@ func (s service) FindAll(ctx context.Context, search, clientID string, page, lim
 	}
 
 	if clientID != "" {
-		err = query.Where("user_id = ? AND client_id = ?", userID, clientID).Association("Clients").Error
+		err = query.
+			Where("user_id = ? AND client.id = ?", userID, clientID).
+			Preload("Clients").
+			Find(&addresses).Error
 	} else {
-		err = s.db.Model(addresses).
-			Debug().
-			Limit(limit).
-			Offset(offset).
+		err = query.
+			Where("user_id = ?", userID).
 			Preload("Clients").
 			Find(&addresses).Error
 	}
@@ -91,16 +92,17 @@ func (s service) Create(ctx context.Context, address entity.Address) (err error)
 	return
 }
 
-// FindByID get a specific client by ID.
-func (s service) FindByID(ctx context.Context, id string) (client entity.Client, err error) {
+// FindByID get a specific address by ID.
+func (s service) FindByID(ctx context.Context, id string) (address entity.Address, err error) {
 	l := log.Ctx(ctx)
 	userID := session.UserGetIDFromContext(ctx)
-	client.ID = id
+	address.ID = id
+	address.UserID = userID
 
-	err = s.db.Model(&client).Where("user_id = ?", userID).Find(&client).Error
+	err = s.db.Model(&address).Find(&address).Error
 	if err == gorm.ErrRecordNotFound {
 		l.Warn().Caller().Msg(fmt.Sprintf("client with id '%s' was not found", id))
-		return client, e.ErrNotFound
+		return address, e.ErrNotFound
 	}
 	if err != nil {
 		l.Error().Caller().Msg(err.Error())
@@ -110,38 +112,59 @@ func (s service) FindByID(ctx context.Context, id string) (client entity.Client,
 }
 
 // Update change specific address by ID.
-func (s service) Update(ctx context.Context, address entity.Address) (entity.Address, error) {
+func (s service) Update(ctx context.Context, id, action string, address entity.Address, clientIDs []string) (err error) {
 	l := log.Ctx(ctx)
 	userID := session.UserGetIDFromContext(ctx)
 	address.UserID = userID
+	address.ID = id
 
-	err := s.db.Debug().Create(&address).Save(&address).Error
+	var clients []entity.Client
+	for _, id := range clientIDs {
+		clients = append(clients, entity.Client{ID: id})
+	}
+
+	fmt.Println("clients")
+	fmt.Println(clients)
+
+	switch action {
+	case "append":
+		fmt.Println("append")
+		err = s.db.Debug().Model(&address).Where("id = ? AND user_id = ?", id, userID).Association("Clients").Append(clients)
+	case "remove":
+		fmt.Println("remove")
+		err = s.db.Debug().Model(&address).Where("id = ? AND user_id = ?", id, userID).Association("Clients").Delete(clients)
+	default:
+		err = s.db.Debug().Model(&address).Where("id = ? AND user_id = ?", id, userID).Updates(address).Error
+	}
 
 	if err == gorm.ErrRecordNotFound {
 		l.Info().Caller().Msg(fmt.Sprintf("the address with id '%s' and user_id '%s' was not found", address.ID, userID))
-		return address, e.ErrUserNotFound
+		return e.ErrUserNotFound
 	}
 
 	if err != nil {
 		l.Error().Caller().Msg(err.Error())
-		return address, err
+		return err
 	}
-	return address, nil
+	return nil
 }
 
 // Delete disable or delete a specific address by ID.
-func (s service) Delete(ctx context.Context, id, clientID string) (address entity.Address, err error) {
+func (s service) Delete(ctx context.Context, id string) (address entity.Address, err error) {
 	l := log.Ctx(ctx)
 	userID := session.UserGetIDFromContext(ctx)
 	address.ID = id
 	address.UserID = userID
 
-	if clientID != "" {
-		client := entity.Client{ID: clientID}
-		err = s.db.Model(&address).Association("Clients").Delete(client)
-	} else {
-		err = s.db.Model(&address).Find(&address).Delete(&address).Error
-	}
+	err = s.db.Debug().Transaction(func(tx *gorm.DB) error {
+		if err = tx.Debug().Model(&address).Association("Clients").Clear(); err != nil {
+			return err
+		}
+		if err = tx.Debug().Model(&address).Delete(address).Error; err != nil {
+			return err
+		}
+		return nil
+	})
 
 	if err == gorm.ErrRecordNotFound {
 		l.Info().Caller().Msg(fmt.Sprintf("the address with id '%s' was not found", id))

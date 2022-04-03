@@ -11,6 +11,16 @@ type response struct {
 	Message string      `json:"message,omitempty"`
 }
 
+func encodeCheck(w http.ResponseWriter) (err error) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	err = json.NewEncoder(w).Encode(response{
+		Status: "successful",
+	})
+	return
+}
+
 func encodeLogout(w http.ResponseWriter) (err error) {
 	cookie := &http.Cookie{
 		Name:   "session",

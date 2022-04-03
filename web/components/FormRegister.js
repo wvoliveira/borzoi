@@ -2,6 +2,7 @@ import Router from "next/router";
 import React from "react";
 
 import {AuthAPI} from "../lib/api/auth";
+import {Button, TextField} from "@mui/material";
 
 export default function FormRegister() {
     const [isLoading, setLoading] = React.useState(false);
@@ -39,38 +40,40 @@ export default function FormRegister() {
         }
     };
 
-    return (<form onSubmit={handleSubmit}>
-        Name:{" "}
-        <input
-            name="name"
-            type="text"
-            placeholder="Name"
-            value={name}
-            onChange={handleName}
-        />
-        <br/>
-        Email:{" "}
-        <input
-            name="email"
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={handleEmail}
-        />
-        <br/>
-        Password:{" "}
-        <input
-            name="password"
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={handlePassword}
-        />
-        <br/>
-        <button type="submit" disabled={isLoading}>
-            Login
-        </button>
-        <br/>
-        {errors ? errors : ""}
-    </form>);
+    return (
+        <form onSubmit={handleSubmit}>
+            <TextField
+                name="name"
+                label="Name"
+                type="text"
+                placeholder="Name"
+                value={name}
+                onChange={handleName}
+                size="small"
+            />
+            {" "}
+            <TextField
+                name="email"
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={handleEmail}
+                size="small"
+            />
+            {" "}
+            <TextField
+                name="password"
+                label="Password"
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={handlePassword}
+                size="small"
+            />
+            {" "}
+            <Button type="submit" variant="contained" disabled={isLoading}>Register</Button>
+            {" "}
+            {errors ? errors : ""}
+        </form>
+    );
 }

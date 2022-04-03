@@ -2,12 +2,12 @@ import Router from "next/router";
 import React from "react";
 
 import {AuthAPI} from "../lib/api/auth";
-import useUser from "../lib/utils/useUser";
-import {Box, TextField} from "@mui/material";
+import useAuth from "../lib/utils/useAuth";
+import {Button, TextField} from "@mui/material";
 
 export default function FormLogin() {
-    const {mutateUser} = useUser({
-        redirectTo: "/profile",
+    const {mutateAuth} = useAuth({
+        redirectTo: "/",
         redirectIfFound: true,
     });
 
@@ -29,9 +29,6 @@ export default function FormLogin() {
         e.preventDefault();
         setLoading(true);
 
-        console.log("email: " + email);
-        console.log("password: " + password);
-
         try {
             const {data, status} = await AuthAPI.Login(email, password);
             if (status !== 200 && status !== 500) {
@@ -40,8 +37,7 @@ export default function FormLogin() {
             }
 
             if (status === 200) {
-                mutateUser(data)
-                Router.push("/");
+                mutateAuth(true)
             }
         } catch (error) {
             console.error(error);
@@ -55,28 +51,26 @@ export default function FormLogin() {
             <TextField
                 id="email"
                 label="Email"
-                variant="outlined"
-                name="email"
                 type="email"
                 placeholder="Email"
                 value={email}
                 onChange={handleEmailChange}
+                size="small"
             />
-            <br/>
+            {" "}
             <TextField
                 id="password"
                 label="Password"
-                variant="outlined"
-                name="password"
                 type="password"
                 placeholder="Password"
                 value={password}
                 onChange={handlePasswordChange}
+                size="small"
             />
-            <br/>
-            <button type="submit" disabled={isLoading}>
+            {" "}
+            <Button type="submit" variant="contained" disabled={isLoading}>
                 Login
-            </button>
+            </Button>
             <br/>
             {errors ? errors : ""}
         </form>

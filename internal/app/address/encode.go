@@ -19,14 +19,14 @@ func encodeCreate(w http.ResponseWriter) (err error) {
 }
 
 // GET /v1/addresses/{id}
-func encodeFindByID(w http.ResponseWriter, client entity.Client) (err error) {
-	response.Normal(w, client, "", http.StatusOK)
+func encodeFindByID(w http.ResponseWriter, address entity.Address) (err error) {
+	response.Normal(w, address, "", http.StatusOK)
 	return
 }
 
 // PATCH /v1/addresses/{id}
-func encodeUpdate(w http.ResponseWriter, address entity.Address) (err error) {
-	response.Normal(w, address, "", http.StatusOK)
+func encodeUpdate(w http.ResponseWriter) (err error) {
+	response.Normal(w, nil, "", http.StatusOK)
 	return
 }
 

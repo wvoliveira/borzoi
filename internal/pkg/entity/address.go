@@ -24,8 +24,8 @@ type Address struct {
 	State      string `json:"state"`
 
 	// Back-reference with User and Client model.
-	UserID  string    `json:"user_id"`
-	Clients []*Client `json:"clients" gorm:"many2many:client_addresses;"`
+	UserID  string    `json:"-"`
+	Clients []*Client `json:"-" gorm:"many2many:client_addresses;"`
 }
 
 func (n *Address) BeforeCreate(_ *gorm.DB) (err error) {
