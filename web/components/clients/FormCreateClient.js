@@ -1,43 +1,41 @@
-import Router from "next/router";
 import React from "react";
-
-import {AuthAPI} from "../lib/api/auth";
-import {Button, TextField} from "@mui/material";
+import {TextField} from "@mui/material";
 import {LoadingButton} from "@mui/lab";
+import {ClientAPI} from "../../lib/api/client";
+import useAuth from "../../lib/utils/useAuth";
 
-export default function FormRegister() {
+export default function FormCreateClient() {
     const [loading, setLoading] = React.useState(false);
     const [errors, setErrors] = React.useState([]);
+
     const [name, setName] = React.useState("");
-    const [email, setEmail] = React.useState("");
-    const [password, setPassword] = React.useState("");
+    const [description, setDescription] = React.useState("");
 
     const handleName = React.useCallback((e) => setName(e.target.value), []);
-    const handleEmail = React.useCallback((e) => setEmail(e.target.value), []);
-    const handlePassword = React.useCallback((e) => setPassword(e.target.value), []);
+    const handleDescription = React.useCallback((e) => setDescription(e.target.value), []);
+
+    const {mutate: mutateFindAll} = ClientAPI.FindAll();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
 
         console.log("name: " + name);
-        console.log("email: " + email);
-        console.log("password: " + password);
+        console.log("description: " + description);
 
         try {
-            const {data, status} = await AuthAPI.Register(name, email, password);
+            const {data, status} = await ClientAPI.Create(name, description);
             if (status !== 200 && status !== 500) {
                 setErrors(data.message);
                 console.log(data.message);
-            }
-
-            if (status === 200) {
-                await Router.push("/login");
             }
         } catch (error) {
             console.error(error);
         } finally {
             setLoading(false);
+            setName("")
+            setDescription("")
+            await mutateFindAll()
         }
     };
 
@@ -55,29 +53,18 @@ export default function FormRegister() {
             />
             {" "}
             <TextField
-                name="email"
-                label="Email"
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={handleEmail}
-                size="small"
-                required
-            />
-            {" "}
-            <TextField
-                name="password"
-                label="Password"
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={handlePassword}
+                name="description"
+                label="Description"
+                type="text"
+                placeholder="Description"
+                value={description}
+                onChange={handleDescription}
                 size="small"
                 required
             />
             {" "}
             <LoadingButton type="submit" onClick={handleSubmit} variant="contained" loading={loading}>
-                Register
+                Create
             </LoadingButton>
             {" "}
             {errors ? errors : ""}

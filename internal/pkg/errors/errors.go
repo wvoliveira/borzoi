@@ -42,7 +42,7 @@ var (
 
 	// ErrClientNotFound default clients errors.
 	ErrClientNotFound   = errors.New("client not found")
-	ErrClientBadRequest = errors.New("you need send a body with name")
+	ErrClientBadRequest = errors.New("you need send a body with name and description")
 
 	// Internal errors.
 	ErrInternalServerError = errors.New("internal server error")

@@ -33,6 +33,10 @@ export default function Header() {
             {auth && (
                 <>
                     <Typography>
+                        <LinkStyle href="/jobs" text="Jobs"/>
+                        {" | "}
+                        <LinkStyle href="/clients" text="Clients"/>
+                        {" • "}
                         <LinkStyle href="/profile" text="Profile"/>
                         {" | "}
                         <LinkStyle href="/logout" text="Logout" onClick={handleLogout}/>

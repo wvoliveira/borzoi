@@ -12,7 +12,7 @@ type Response struct {
 	Message string      `json:"message,omitempty"`
 }
 
-func Normal(w http.ResponseWriter, data interface{}, message string, status int) {
+func Default(w http.ResponseWriter, data interface{}, message string, status int) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	_ = json.NewEncoder(w).Encode(Response{

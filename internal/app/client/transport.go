@@ -26,13 +26,13 @@ func (s service) HTTPFindAll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	clients, err := s.FindAll(r.Context(), search, page, limit)
+	clients, pages, total, err := s.FindAll(r.Context(), search, page, limit)
 	if err != nil {
 		e.EncodeError(w, err)
 		return
 	}
 
-	err = encodeFindAll(w, clients)
+	err = encodeFindAll(w, clients, page, pages, limit, total)
 	if err != nil {
 		e.EncodeError(w, err)
 		return
@@ -104,19 +104,19 @@ func (s service) HTTPUpdate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s service) HTTPDelete(w http.ResponseWriter, r *http.Request) {
-	id, del, err := decodeDelete(r)
+	id, err := decodeDelete(r)
 	if err != nil {
 		e.EncodeError(w, err)
 		return
 	}
 
-	client, err := s.Delete(r.Context(), id, del)
+	err = s.Delete(r.Context(), id)
 	if err != nil {
 		e.EncodeError(w, err)
 		return
 	}
 
-	err = encodeDelete(w, client)
+	err = encodeDelete(w)
 	if err != nil {
 		e.EncodeError(w, err)
 		return

@@ -3,17 +3,12 @@ import Layout from "../components/Layout";
 import FormLogin from "../components/FormLogin";
 import Box from '@mui/material/Box';
 import Link from "next/link";
-import Typography from "@mui/material/Typography";
+import FormForgotPassword from "../components/FormForgotPassword";
 
 export default function Login() {
     return (
         <Layout>
-            <FormLogin/>
-            <Typography>
-            <Link href="/forgot">
-                <a style={{ textDecoration: 'none', color: '#000' }}>Forgot my password.</a>
-            </Link>
-            </Typography>
+            <FormForgotPassword />
         </Layout>
     );
 }

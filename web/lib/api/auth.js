@@ -45,4 +45,18 @@ export const AuthAPI = {
             return error.response;
         }
     },
+    Forgot: async(email) => {
+        try {
+            return await axios.post(
+                '/api/auth/forgot',
+                JSON.stringify({"email": email}), {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+        } catch (error) {
+            return error.response;
+        }
+    },
 }
