@@ -3,6 +3,8 @@ package client
 import (
 	"context"
 	"fmt"
+	"net/http"
+
 	"github.com/dgraph-io/badger/v3"
 	"github.com/elga-io/borzoi/internal/pkg/entity"
 	e "github.com/elga-io/borzoi/internal/pkg/errors"
@@ -10,7 +12,6 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
-	"net/http"
 )
 
 // Service encapsulates the link service logic, http handlers and another transport layer.
@@ -44,19 +45,26 @@ func (s service) FindAll(ctx context.Context, search string, page, limit int) (c
 
 	offset := 0
 	if page > 1 {
-		offset = page * limit
+		offset = (page * limit) - limit
 	}
 
 	query := s.db.Model(&entity.Client{}).
 		Debug().
-		Limit(limit).
-		Offset(offset)
+		Offset(offset).
+		Limit(limit)
 
 	if search != "" {
 		query = query.Where("name LIKE ?", fmt.Sprintf("%[1]s%s%[1]s", "%", search))
 	}
 
-	err = query.Where("user_id = ?", userID).Find(&clients).Count(&total).Error
+	err = query.
+		Where("user_id = ?", userID).
+		Find(&clients).
+		Offset(-1).
+		Limit(-1).
+		Count(&total).Error
+
+	fmt.Printf("TOTAL: %v\n", total)
 
 	if int(total) <= limit {
 		pages = 1

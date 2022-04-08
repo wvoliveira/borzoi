@@ -7,7 +7,7 @@ export default function Home() {
     return (
         <Layout>
             <Typography noWrap component="div">
-                A client management system.
+                Home.
             </Typography>
         </Layout>
     );

@@ -1,87 +1,67 @@
 import React from "react";
-import {ClientAPI} from "../../lib/api/client";
-import {DataGrid} from "@mui/x-data-grid";
+import axios from "axios";
+import { ClientAPI } from "../../lib/api/client";
+import { DataGrid } from "@mui/x-data-grid";
 
 export default function TableClients() {
-    const [loading, setLoading] = React.useState(true);
-
-    const {data, error, mutate} = ClientAPI.FindAll();
-
     const columns = [
-        {field: 'id', headerName: 'ID', width: 10},
-        {field: 'name', headerName: 'Name', minWidth: 110},
-        {field: 'description', headerName: 'Description', flex: 1},
+        { field: 'id', headerName: 'ID', width: 10 },
+        { field: 'name', headerName: 'Name', minWidth: 110 },
+        { field: 'description', headerName: 'Description', flex: 1 },
     ]
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const [page, setPage] = React.useState(0);
+    const [limit, setLimit] = React.useState(5);
+    const [total, setTotal] = React.useState(0);
+    const [rows, setRows] = React.useState([]);
+
+    const [loading, setLoading] = React.useState(false);
+    const [selectionModel, setSelectionModel] = React.useState([]);
+    const prevSelectionModel = React.useRef(selectionModel);
+
+    React.useEffect(() => {
         setLoading(true);
 
-        try {
-            const {data, status} = ClientAPI.FindAll();
-            if (status !== 200 && status !== 500) {
-                //setError(data.message);
-                console.log(data.message);
-            }
-            // setClients(data.data);
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoading(false);
+        const getClients = async () => {
+            page +=1;
+            const result = await axios.get(`/api/v1/clients?page=${page}&limit=${limit}`)
+            const body = await result.data;
+            const data = body.data;
+    
+            setRows(data.clients);
+            setTotal(data.total);
         }
-    };
 
-    const handlePageSize = async (pageSize) => {
-        setLoading(true);
-        try {
-            const {data, status} = ClientAPI.FindAll({limit: pageSize});
-            if (status !== 200 && status !== 500) {
-                console.log(data.message);
-            }
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoading(false);
-        }
-    };
+        getClients();
+        setLoading(false);
 
-    const handlePage = async (page) => {
-        setLoading(true);
-        try {
-            const {data, status} = ClientAPI.FindAll({page: page});
-            if (status !== 200 && status !== 500) {
-                console.log(data.message);
-            }
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoading(false);
-        }
-    };
+        setTimeout(() => {
+            setSelectionModel(prevSelectionModel.current);
+        });
 
-    if (!data) {
-        return (
-            <div style={{height: 400, width: '80%'}}>
-                <DataGrid
-                    loading={true}
-                    columns={columns}
-                    rows={[]}/>
-            </div>
-        )
-    }
+    }, [page]);
 
     return (
-        <div style={{height: 400, width: '80%'}}>
+        <div style={{ height: 400, width: '100%' }}>
             <DataGrid
-                rows={data.clients}
+                rows={rows}
                 columns={columns}
                 pagination
-                pageSize={data.per_page}
-                rowsPerPageOptions={[10]}
-                rowCount={data.total}
+                pageSize={limit}
+                rowsPerPageOptions={[5]}
+                rowCount={total}
                 paginationMode="server"
-                onPageChange={handlePage}
-                page={data.page}
+
+                onPageChange={(newPage) => {
+                    prevSelectionModel.current = selectionModel;
+                    setPage(newPage);
+                }}
+                onSelectionModelChange={(newSelectionModel) => {
+                    setSelectionModel(newSelectionModel);
+                }}
+
+                selectionModel={selectionModel}
+                loading={loading}
             />
         </div>
     );

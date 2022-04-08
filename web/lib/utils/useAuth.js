@@ -6,7 +6,7 @@ export default function useAuth({
                                     redirectTo = "",
                                     redirectIfFound = false,
                                 } = {}) {
-    const {data: auth, error: error, mutate: mutateAuth} = useSWR("/api/auth/check");
+    const {data: auth, error: error, mutate: mutateAuth} = useSWR('/api/auth/check', { refreshInterval: 0 });
 
     useEffect(() => {
         // if no redirect needed, just return (example: already on /dashboard)

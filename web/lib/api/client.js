@@ -19,17 +19,30 @@ export const ClientAPI = {
             return error.response;
         }
     },
-    FindAll: (page= 1, limit= 10) => {
-        let {data, error, mutate} = useSWR(`/api/v1/clients?page=${page}&limit=${limit}`);
-        let clients;
-        if (!data) {
-            clients = [];
-            return {clients, error, mutate};
+    FindAll: async(page, limit) => {
+        if (page === undefined || page === 0) {
+            page = 1
         }
-        if (data) {
-            data = data.data;
-            return {data, error, mutate};
+
+        if (limit === undefined || limit === 0) {
+            limit = 5
         }
-        return {data, error, mutate};
+
+        try {
+            const res = await axios.get(
+                `/api/v1/clients?page=${page}&limit=${limit}`,
+                {
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+            const data = await res.data;
+            console.log(data);
+            return { data: data };
+        } catch (error) {
+            return error.response;
+        }
     },
 }

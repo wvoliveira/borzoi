@@ -6,6 +6,14 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"io/fs"
+	"net/http"
+	"os"
+	"os/signal"
+	"path/filepath"
+	"syscall"
+	"time"
+
 	"github.com/elga-io/borzoi/internal/app/address"
 	"github.com/elga-io/borzoi/internal/app/auth"
 	"github.com/elga-io/borzoi/internal/app/auth/password"
@@ -18,13 +26,6 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	"io/fs"
-	"net/http"
-	"os"
-	"os/signal"
-	"path/filepath"
-	"syscall"
-	"time"
 )
 
 //const version = "0.0.0"
@@ -84,24 +85,36 @@ func main() {
 	apiRouter := router.PathPrefix("/api").Subrouter().StrictSlash(true)
 	webRouter := router.PathPrefix("/").Subrouter().StrictSlash(true)
 
+	// Start services.
+	// Each service can separated per mini-service.
+	// With HTTP, RPC, MQ or another transport.
+
+	// Authentication service.
+	// Root level, like /logout or /check endpoint.
 	authService := auth.NewService(db, cache)
 	authService.HTTPNew(apiRouter)
 
+	// Password auth service.
 	authPasswordService := password.NewService(db, cache)
 	authPasswordService.HTTPNew(apiRouter)
 
+	// Users service.
 	userService := user.NewService(db, cache)
 	userService.HTTPNew(apiRouter)
 
+	// Clients service.
 	clientService := client.NewService(db, cache)
 	clientService.HTTPNew(apiRouter)
 
+	// Addresses service.
 	addressService := address.NewService(db, cache)
 	addressService.HTTPNew(apiRouter)
 
+	// Web app.
 	webHandler := http.FileServer(http.FS(distFS))
 	webRouter.PathPrefix("").Handler(webHandler)
 
+	// Print routes when startup app.
 	printRoutes([]*mux.Router{webRouter, apiRouter})
 
 	srv := &http.Server{
