@@ -3,12 +3,13 @@ import { ClientAPI } from "../../lib/api/client";
 import { DataGrid } from "@mui/x-data-grid";
 import Rating from "@mui/material/Rating";
 import { format } from "date-fns";
+import Button from '@mui/material/Button';
 
 export default function TableClients() {
     const columns = [
-        { field: "id", headerName: "ID", minWidth   : 30 },
-        { field: "name", headerName: "Name", minWidth: 200 },
-        { field: "description", headerName: "Description", minWidth: 400 },
+        { field: "id", headerName: "ID", width: 50 },
+        { field: "name", headerName: "Name", flex: 1 },
+        { field: "description", headerName: "Description", flex: 1.5 },
         {
             field: "score",
             headerName: "Score",
@@ -42,31 +43,38 @@ export default function TableClients() {
     const [total, setTotal] = React.useState(0);
     const [rows, setRows] = React.useState([]);
 
-    const [loading, setLoading] = React.useState(false);
+    const [loading, setLoading] = React.useState(true);
     const [selectionModel, setSelectionModel] = React.useState([]);
     const prevSelectionModel = React.useRef(selectionModel);
 
+    const getClients = async () => {
+        const result = await ClientAPI.FindAll(page, limit);
+        const body = await result.data;
+        const data = body.data;
+
+        setRows(data.clients);
+        setTotal(data.total);
+    };
+
+    const handleUpdateAllRows = () => {
+        getClients();
+    };
+
     React.useEffect(() => {
         setLoading(true);
-
-        const getClients = async () => {
-            const result = await ClientAPI.FindAll(page, limit);
-            const body = await result.data;
-            const data = body.data;
-
-            setRows(data.clients);
-            setTotal(data.total);
-        };
-
         getClients();
         setLoading(false);
 
         setTimeout(() => {
             setSelectionModel(prevSelectionModel.current);
         });
-    }, [page, limit]);
+    }, [loading, page, limit]);
 
     return (
+        <>
+        <Button size="small" onClick={handleUpdateAllRows}>
+          Refresh
+        </Button>
         <div style={{ height: 500, width: "100%" }}>
             <DataGrid
                 rows={rows}
@@ -78,17 +86,22 @@ export default function TableClients() {
                 paginationMode="server"
                 onPageChange={(newPage) => {
                     prevSelectionModel.current = selectionModel;
+                    setLoading(true);
                     setPage(newPage);
+                    setLoading(false);
                 }}
                 onSelectionModelChange={(newSelectionModel) => {
                     setSelectionModel(newSelectionModel);
                 }}
                 onPageSizeChange={(newPageSize) => {
+                    setLoading(true);
                     setLimit(newPageSize);
+                    setLoading(false);
                 }}
                 selectionModel={selectionModel}
                 loading={loading}
             />
         </div>
+        </>
     );
 }

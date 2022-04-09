@@ -15,15 +15,14 @@ export default function ProfileInfo() {
         )
     }
 
-    console.log(user)
-
     return (
         <Typography>
             Name: {user.data.name}<br/>
             Identities:<br/>
             {user.data.identities.map(item => {
                 if (item.provider === "email") {
-                    return <EmailIcon />;
+                    return <EmailIcon key={item.provider} />;
+                    { " " }
                 }
                 return <></>;
             })}
