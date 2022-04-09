@@ -4,6 +4,8 @@ import { DataGrid } from "@mui/x-data-grid";
 import Rating from "@mui/material/Rating";
 import { format } from "date-fns";
 import Button from '@mui/material/Button';
+import Skeleton from '@mui/material/Skeleton';
+import Stack from '@mui/material/Stack';
 
 export default function TableClients() {
     const columns = [
@@ -63,7 +65,7 @@ export default function TableClients() {
     React.useEffect(() => {
         setLoading(true);
         getClients();
-        setLoading(false);
+        setLoading(false)
 
         setTimeout(() => {
             setSelectionModel(prevSelectionModel.current);
@@ -76,6 +78,14 @@ export default function TableClients() {
           Refresh
         </Button>
         <div style={{ height: 500, width: "100%" }}>
+            {loading ? (<>
+                <Stack>
+                    <Skeleton variant="rectangular" height={50} />
+                    {Array.from({length: 10}, (_, i) => (
+                        <Skeleton key={i} variant="text" height={50} />
+                    ))}
+                </Stack>
+            </>) : <>
             <DataGrid
                 rows={rows}
                 columns={columns}
@@ -101,6 +111,7 @@ export default function TableClients() {
                 selectionModel={selectionModel}
                 loading={loading}
             />
+            </>}
         </div>
         </>
     );
