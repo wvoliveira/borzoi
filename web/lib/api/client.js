@@ -20,27 +20,15 @@ export const ClientAPI = {
         }
     },
     FindAll: async(page, limit) => {
-        if (page === undefined || page === 0) {
-            page = 1
-        }
+        // Just return if page or limit is undefined.
+        if (page == undefined || limit == undefined) {return}
 
-        if (limit === undefined || limit === 0) {
-            limit = 5
-        }
+        // Datagrid or Table in NextJS starts with 0 (zero) based slide index.
+        // So, we need to increase page number.
+        page +=1;
 
         try {
-            const res = await axios.get(
-                `/api/v1/clients?page=${page}&limit=${limit}`,
-                {
-                    headers: {
-                        "Accept": "application/json",
-                        "Content-Type": "application/json",
-                    },
-                }
-            );
-            const data = await res.data;
-            console.log(data);
-            return { data: data };
+            return await axios.get(`/api/v1/clients?page=${page}&limit=${limit}`)
         } catch (error) {
             return error.response;
         }
