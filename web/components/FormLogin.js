@@ -1,12 +1,13 @@
 import React from "react";
 
-import {AuthAPI} from "../lib/api/auth";
+import { AuthAPI } from "../lib/api/auth";
 import useAuth from "../lib/utils/useAuth";
-import {TextField} from "@mui/material";
-import {LoadingButton} from "@mui/lab";
+import { TextField, Typography } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
+import Link from "next/link";
 
 export default function FormLogin() {
-    const {mutateAuth} = useAuth({
+    const { mutateAuth } = useAuth({
         redirectTo: "/",
         redirectIfFound: true,
     });
@@ -30,14 +31,14 @@ export default function FormLogin() {
         setLoading(true);
 
         try {
-            const {data, status} = await AuthAPI.Login(email, password);
+            const { data, status } = await AuthAPI.Login(email, password);
             if (status !== 200 && status !== 500) {
                 setError(data.message);
                 console.log(data.message);
             }
 
             if (status === 200) {
-                mutateAuth(true)
+                mutateAuth(true);
             }
         } catch (error) {
             console.error(error);
@@ -57,8 +58,7 @@ export default function FormLogin() {
                 onChange={handleEmailChange}
                 size="small"
                 required
-            />
-            {" "}
+            />{" "}
             <TextField
                 id="password"
                 label="Password"
@@ -68,13 +68,24 @@ export default function FormLogin() {
                 onChange={handlePasswordChange}
                 size="small"
                 required
-            />
-            {" "}
-            <LoadingButton type="submit" onClick={handleSubmit} variant="contained" loading={loading}>
+            />{" "}
+            <LoadingButton
+                type="submit"
+                onClick={handleSubmit}
+                variant="contained"
+                loading={loading}
+            >
                 Login
-            </LoadingButton>
-            <br/>
+            </LoadingButton>{" "}
             {error ? error : ""}
+            <br />
+            <Typography>
+                <Link href="/forgot">
+                    <a style={{ textDecoration: "none", color: "#000" }}>
+                        Forgot my password.
+                    </a>
+                </Link>
+            </Typography>
         </form>
     );
 }

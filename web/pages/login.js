@@ -9,11 +9,6 @@ export default function Login() {
     return (
         <Layout>
             <FormLogin/>
-            <Typography>
-            <Link href="/forgot">
-                <a style={{ textDecoration: 'none', color: '#000' }}>Forgot my password.</a>
-            </Link>
-            </Typography>
         </Layout>
     );
 }
