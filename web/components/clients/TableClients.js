@@ -39,7 +39,7 @@ export default function TableClients() {
     ];
 
     const [page, setPage] = React.useState(0);
-    const [limit, setLimit] = React.useState(10);
+    const [limit, setLimit] = React.useState(5);
     const [total, setTotal] = React.useState(0);
     const [rows, setRows] = React.useState([]);
 
