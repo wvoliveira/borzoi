@@ -12,7 +12,7 @@
 					"name": "Password",
 					"item": [
 						{
-							"name": "POST /api/v1/auth/password/login",
+							"name": "POST /api/auth/password/login",
 							"request": {
 								"method": "POST",
 								"header": [],
@@ -26,13 +26,12 @@
 									}
 								},
 								"url": {
-									"raw": "{{api_url}}/api/v1/auth/password/login",
+									"raw": "{{api_url}}/api/auth/password/login",
 									"host": [
 										"{{api_url}}"
 									],
 									"path": [
 										"api",
-										"v1",
 										"auth",
 										"password",
 										"login"
@@ -42,7 +41,7 @@
 							"response": []
 						},
 						{
-							"name": "POST /api/v1/auth/password/register",
+							"name": "POST /api/auth/password/register",
 							"request": {
 								"method": "POST",
 								"header": [],
@@ -56,13 +55,12 @@
 									}
 								},
 								"url": {
-									"raw": "{{api_url}}/api/v1/auth/password/register",
+									"raw": "{{api_url}}/api/auth/password/register",
 									"host": [
 										"{{api_url}}"
 									],
 									"path": [
 										"api",
-										"v1",
 										"auth",
 										"password",
 										"register"
@@ -72,6 +70,25 @@
 							"response": []
 						}
 					]
+				},
+				{
+					"name": "POST /api/auth/logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/api/auth/logout",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -93,6 +110,236 @@
 								"v1",
 								"users",
 								"me"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Clients",
+			"item": [
+				{
+					"name": "GET /api/v1/clients",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/api/v1/clients?page=3&limit=5",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"clients"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "3"
+								},
+								{
+									"key": "limit",
+									"value": "5"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /api/v1/clients/{id}",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/api/v1/clients/16d2a98b-986d-4213-8a56-2e9198625f25",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"clients",
+								"16d2a98b-986d-4213-8a56-2e9198625f25"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /api/v1/clients",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\":\"Moises\", \"description\":\"A melhor pessoa do mundo\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api_url}}/api/v1/clients",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"clients"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE /api/v1/clients/{id}",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/api/v1/clients/91272b7a-8003-48a2-95e9-c6a6e41753b1",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"clients",
+								"91272b7a-8003-48a2-95e9-c6a6e41753b1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Addresses",
+			"item": [
+				{
+					"name": "GET /api/v1/addresses",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/api/v1/addresses",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"addresses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /api/v1/addresses/{id}",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/api/v1/addresses/{id}",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"addresses",
+								"{id}"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /api/v1/addresses",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"country\":\"Brasil\",\"name\":\"Casa do Silvio Santos\", \"phone\": \"+5511911112222\", \"cep\": \"05692000\", \"street\":\"R. Antônio de Andrade Rebelo\", \"number\":\"480\", \"district\":\"Retiro Morumbi\", \"city\":\"São Paulo\", \"State\":\"São Paulo\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api_url}}/api/v1/addresses",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"addresses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE /api/v1/addresses",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/api/v1/addresses/33fb3c37-583b-4287-b60f-6823d02b91fd",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"addresses",
+								"33fb3c37-583b-4287-b60f-6823d02b91fd"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PATCH /api/v1/addresses",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"action\":\"append\",\"address\":{\"number\":\"480\"},\"client_ids\":[\"2e941af5-b523-473b-aeb6-8f53934b0ebb\"]}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api_url}}/api/v1/addresses/d01b8e9f-0bd6-4e3c-833a-7663fba6cd21",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"addresses",
+								"d01b8e9f-0bd6-4e3c-833a-7663fba6cd21"
 							]
 						}
 					},
