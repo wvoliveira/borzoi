@@ -99,8 +99,7 @@ func (s service) Login(ctx context.Context, identity entity.Identity) (token str
 		l.Error().Caller().Msg(err.Error())
 	}
 
-	// Update "last login" from user info.
-	// And I don't care if errors happens.
+	// Update "last login" from user info and I don't care if errors happens.
 	now := time.Now()
 	identity.LastLogin = &now
 
