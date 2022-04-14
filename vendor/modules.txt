@@ -84,6 +84,9 @@ github.com/rs/zerolog
 github.com/rs/zerolog/internal/cbor
 github.com/rs/zerolog/internal/json
 github.com/rs/zerolog/log
+# github.com/segmentio/ksuid v1.0.4
+## explicit
+github.com/segmentio/ksuid
 # go.opencensus.io v0.22.5
 go.opencensus.io
 go.opencensus.io/internal
