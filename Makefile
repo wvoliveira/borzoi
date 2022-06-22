@@ -1,6 +1,10 @@
 export CGO_ENABLED = 1
 export NEXT_TELEMETRY_DISABLED = 1
 
+.PHONY: run
+run:
+	go run ./cmd/borzoi/
+
 .PHONY: build
 build: build-web
 	go build ./cmd/borzoi

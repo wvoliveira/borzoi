@@ -58,12 +58,9 @@ type response struct {
 	Message string      `json:"message,omitempty"`
 }
 
-/*
-	Errorer is implemented by all concrete response types that may contain
-	errors. It allows us to change the HTTP response code without needing to
-	trigger an endpoint (transport-level) error. For more information, read the
-	big comment in endpoints.go.
-*/
+// Errorer is implemented by all concrete response types that may contain
+// errors. It allows us to change the HTTP response code without needing to
+// trigger an endpoint (transport-level) error.
 type Errorer interface {
 	Error() error
 }
@@ -74,9 +71,10 @@ func EncodeError(w http.ResponseWriter, err error) {
 		panic("encodeError with nil error")
 	}
 	r := response{Status: "error", Data: nil, Message: err.Error()}
-	w.Header().Set("Content-Type", "application/json")
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(codeFrom(err))
+
 	_ = json.NewEncoder(w).Encode(r)
 }
 
@@ -84,11 +82,14 @@ func codeFrom(err error) int {
 	switch err {
 	case ErrNotFound, ErrLinkNotFound:
 		return http.StatusNotFound
+
 	case ErrInconsistentIDs, ErrAccountDeleteYourSelf, ErrLinkAlreadyExists, ErrAlreadyExists, ErrLinkInvalidDomain,
 		ErrLinkInvalidKeyword, ErrLinkInvalidURL, ErrClientBadRequest:
 		return http.StatusBadRequest
+
 	case ErrAuthUnauthorized, ErrTokenNotFound, ErrTokenParse, ErrTokenExpired:
 		return http.StatusUnauthorized
+
 	default:
 		return http.StatusInternalServerError
 	}

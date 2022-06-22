@@ -1,15 +1,16 @@
 package database
 
 import (
-	"github.com/dgraph-io/badger/v3"
-	"gorm.io/driver/mysql"
-	"gorm.io/driver/postgres"
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 	"log"
 	"os"
 	"time"
+
+	"github.com/dgraph-io/badger/v3"
+	"github.com/glebarez/sqlite"
+	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 // NewSQLDatabase create a gorm database object.
@@ -25,6 +26,7 @@ func NewSQLDatabase(kind, dsn string) (db *gorm.DB) {
 			Colorful:                  false,         // Disable color
 		},
 	)
+
 	cfg := gorm.Config{Logger: newLogger}
 
 	switch kind {
@@ -34,18 +36,21 @@ func NewSQLDatabase(kind, dsn string) (db *gorm.DB) {
 			panic("failed to connect in sqlite database")
 		}
 		return db
+
 	case "mysql":
 		db, err := gorm.Open(mysql.Open(dsn), &cfg)
 		if err != nil {
 			panic("failed to connect in mysql database")
 		}
 		return db
+
 	case "postgresql":
 		db, err := gorm.Open(postgres.Open(dsn), &cfg)
 		if err != nil {
 			panic("failed to connect in postgresql database")
 		}
 		return db
+
 	default:
 		log.Fatal("this type of database is not supported")
 	}
@@ -63,6 +68,7 @@ func NewNoSQLDatabase(kind, dsn string) (db *badger.DB) {
 			log.Fatalf("error to connect in badger database: %s", err)
 		}
 		return db
+
 	default:
 		log.Fatal("this type of database is not supported")
 	}
