@@ -9,23 +9,23 @@ export default function ProfileInfo() {
 
     if (!user) {
         return (
-            <Typography>
-                Loading...
-            </Typography>
+            <p>Loading...</p>
         )
     }
 
+    console.log(user);
+
     return (
-        <Typography>
-            Name: {user.data.name}<br/>
-            Identities:<br/>
+        <>
+            <p>Name: {user.data.name}</p>
+            <div>Identities: 
             {user.data.identities.map(item => {
-                if (item.provider === "email") {
-                    return <EmailIcon key={item.provider} />;
-                    { " " }
-                }
-                return <></>;
+                return <>{" "}
+                    {item.provider}
+                    {" "}
+                </>;
             })}
-        </Typography>
+            </div>
+        </>
     )
 }

@@ -5,6 +5,10 @@ export NEXT_TELEMETRY_DISABLED = 1
 run:
 	go run ./cmd/borzoi/
 
+.PHONY: run-web
+run-web:
+	cd web && npm run dev
+
 .PHONY: build
 build: build-web
 	go build ./cmd/borzoi

@@ -7,12 +7,9 @@ import ProfileInfo from "../components/ProfileInfo";
 
 // Make sure to check https://nextjs.org/docs/basic-features/layouts for more info on how to use layouts
 export default function Profile() {
-    return (
-        <Layout>
-            <Typography variant="h6">
-                Profile
-            </Typography>
+    return (<>
+            <h2>Profile</h2>
             <ProfileInfo />
-        </Layout>
+        </>
     );
 }

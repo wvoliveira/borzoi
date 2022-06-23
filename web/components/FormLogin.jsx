@@ -47,9 +47,9 @@ export default function FormLogin() {
         }
     };
 
-    return (
+    return (<>
         <form>
-            <TextField
+            <input
                 id="email"
                 label="Email"
                 type="email"
@@ -59,7 +59,7 @@ export default function FormLogin() {
                 size="small"
                 required
             />{" "}
-            <TextField
+            <input
                 id="password"
                 label="Password"
                 type="password"
@@ -69,23 +69,19 @@ export default function FormLogin() {
                 size="small"
                 required
             />{" "}
-            <LoadingButton
+            <button
                 type="submit"
                 onClick={handleSubmit}
                 variant="contained"
                 loading={loading}
             >
                 Login
-            </LoadingButton>{" "}
+            </button>{" "}
             {error ? error : ""}
             <br />
-            <Typography>
-                <Link href="/forgot">
-                    <a style={{ textDecoration: "none", color: "#000" }}>
-                        Forgot my password.
-                    </a>
-                </Link>
-            </Typography>
         </form>
-    );
+        <Link href="/forgot">
+            <a>I forget my password.</a>
+        </Link>
+    </>);
 }
