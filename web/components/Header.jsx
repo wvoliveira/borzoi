@@ -25,11 +25,10 @@ export default function Header() {
             {!auth && (
                 <div className="menu button">
                     <Link href="/login">
-                        <a>Login</a>
+                        <a>login</a>
                     </Link>
-                    {" | "}
                     <Link href="/register">
-                        <a>Register</a>
+                        <a>register</a>
                     </Link>
                 </div>
             )}
@@ -37,19 +36,16 @@ export default function Header() {
             {auth && (
                 <div className="menu button">
                     <Link href="/jobs">
-                        <a>Jobs</a>
+                        <a>jobs</a>
                     </Link>
-                    {" | "}
                     <Link href="/clients">
-                        <a>Clients</a>
+                        <a>clients</a>
                     </Link>
-                    {" | "}
                     <Link href="/profile">
-                        <a>Profile</a>
+                        <a>profile</a>
                     </Link>
-                    {" | "}
                     <Link href="/logout" onClick={handleLogout}>
-                        <a>Logout</a>
+                        <a>logout</a>
                     </Link>
                 </div>
             )}

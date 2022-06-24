@@ -2,10 +2,36 @@
   padding: 5px;
 }
 
+.all {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 95%;
+}
+
+header {
+  vertical-align: text-bottom;
+}
+
 .logo {
+  display: inline-block;
   font-family: "Bebas Neue";
-  font-size: 35px;
+  font-size: 40px;
   padding-left: 0;
+  padding-right: 20px;
+}
+
+.logo>a:hover {
+  color: #fca311;
 }
 
 a {
@@ -23,29 +49,36 @@ body, input, button {
   font-weight: 300;
 }
 
-.all {
-  display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-}
-
-.app {
-  display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  justify-content: center;
-  width: 95%;
-}
-
 .menu.button {
-  padding-left: 0;
+  display: inline-block;
+  vertical-align: text-bottom;
 }
 
-.menu.button>a:hover {
-  border: 1px solid black;
-  outline: none;
+.menu.button a {
+  /* padding-left: 15px;
+  padding-right: 15px; */
+  margin-left: 10px;
+  margin-right: 10px;
+  /* padding-top: 15px;
+  padding-bottom: 10px; */
+}
+
+.menu.button>a {
+  color: black;
+  display: inline-block;
+  margin: 0;
+}
+
+.menu.button>a:after {
+  display: block;
+  content: '';
+  border-bottom: solid 3px black;  
+  transform: scaleX(0);  
+  transition: transform .2s ease-in-out;
+}
+
+.menu.button>a:hover:after {
+  transform: scaleX(1);
 }
 
 input, button {
@@ -53,5 +86,61 @@ input, button {
 }
 
 button {
-  font-weight: 800;
+  font-weight: bold;
+  font-style: normal;
+  padding-left: 6px;
+  padding-right: 6px;
+}
+
+/* smartphones, iPhone, portrait 480x320 phones */
+@media only screen and (max-width:699px)  {
+  body {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+
+  .all {
+    width: 100%;
+    padding: 0;
+  }
+
+  .app {
+    width: 100%;
+    padding: 0;
+  }
+
+  .logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+  }
+
+  .menu.button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+/* tablet, landscape iPad, lo-res laptops ands desktops */
+@media only screen and (min-width:700px)  { 
+  body {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+
+  .all {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+
+  .app {
+    width: 95%;
+    padding: 5px;
+    margin: 0;
+  }
 }

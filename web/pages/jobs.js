@@ -7,10 +7,6 @@ import TableClients from "../components/clients/TableClients";
 
 export default function Clients() {
     return (
-        <Layout>
-            <Typography>
-                Jobs
-            </Typography>
-        </Layout>
+        <h3>Jobs</h3>
     );
 }

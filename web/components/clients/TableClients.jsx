@@ -73,11 +73,11 @@ export default function TableClients() {
     }, [loading, page, limit]);
 
     return (
-        <>
-        <Button size="small" onClick={handleUpdateAllRows}>
+        <div>
+        <button size="small" onClick={handleUpdateAllRows}>
           Refresh
-        </Button>
-        <div style={{ height: 500, width: "100%" }}>
+        </button>
+        <div>
             {loading ? (<>
                 <Stack>
                     <Skeleton variant="rectangular" height={50} />
@@ -86,33 +86,10 @@ export default function TableClients() {
                     ))}
                 </Stack>
             </>) : <>
-            <DataGrid
-                rows={rows}
-                columns={columns}
-                pagination
-                pageSize={limit}
-                rowsPerPageOptions={[5, 10, 20]}
-                rowCount={total}
-                paginationMode="server"
-                onPageChange={(newPage) => {
-                    prevSelectionModel.current = selectionModel;
-                    setLoading(true);
-                    setPage(newPage);
-                    setLoading(false);
-                }}
-                onSelectionModelChange={(newSelectionModel) => {
-                    setSelectionModel(newSelectionModel);
-                }}
-                onPageSizeChange={(newPageSize) => {
-                    setLoading(true);
-                    setLimit(newPageSize);
-                    setLoading(false);
-                }}
-                selectionModel={selectionModel}
-                loading={loading}
-            />
+            <table>
+            </table>
             </>}
         </div>
-        </>
+        </div>
     );
 }

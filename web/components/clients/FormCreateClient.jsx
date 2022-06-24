@@ -41,7 +41,7 @@ export default function FormCreateClient() {
 
     return (
         <form>
-            <TextField
+            <input
                 name="name"
                 label="Name"
                 type="text"
@@ -52,7 +52,7 @@ export default function FormCreateClient() {
                 required
             />
             {" "}
-            <TextField
+            <input
                 name="description"
                 label="Description"
                 type="text"
@@ -63,9 +63,9 @@ export default function FormCreateClient() {
                 required
             />
             {" "}
-            <LoadingButton type="submit" onClick={handleSubmit} variant="contained" loading={loading}>
+            <button type="submit" onClick={handleSubmit} variant="contained" loading={loading}>
                 Create
-            </LoadingButton>
+            </button>
             {" "}
             {errors ? errors : ""}
         </form>

@@ -19,11 +19,11 @@ export default function ProfileInfo() {
         <>
             <p>Name: {user.data.name}</p>
             <div>Identities: 
-            {user.data.identities.map(item => {
-                return <>{" "}
+            {user.data.identities.map((item, index) => {
+                return <span key={index}>{" "}
                     {item.provider}
                     {" "}
-                </>;
+                </span>;
             })}
             </div>
         </>
