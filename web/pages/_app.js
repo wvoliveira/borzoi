@@ -14,31 +14,7 @@ import Layout from '../components/Layout';
 export default function App({ Component, ...pageProps }) {
     return (
         <Layout>
-            <SWRConfig
-                value={{
-                    fetcher: fetchJson,
-                    refreshInterval: 3000,
-                    revalidateIfStale: false,
-                    // onError: (err) => {
-                    //     console.error(err);
-                    // },
-                    onErrorRetry: (error, key, config, revalidate, { retryCount }) => {
-                        // Never retry on 404.
-                        if (error.status === 404) return
-
-                        // Never retry for a specific key.
-                        if (key === '/api/auth/check') return
-
-                        // Only retry up to 10 times.
-                        if (retryCount >= 10) return
-
-                        // Retry after 5 seconds.
-                        setTimeout(() => revalidate({ retryCount }), 5000)
-                    }
-                }}
-            >
-                <Component {...pageProps} />
-            </SWRConfig>
+            <Component {...pageProps} />
         </Layout>
     )
 }

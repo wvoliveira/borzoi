@@ -1,27 +1,23 @@
 import * as React from "react";
-import { useEffect } from "react";
 
 import { useRouter } from "next/router";
 import Link from "next/link";
 
 import useAuth from "../lib/utils/useAuth";
 import { AuthAPI } from "../lib/api/auth";
-import { cookieDeleteSesssion } from "../lib/utils/cookie";
+
 
 export default function Header() {
-    const {auth, mutateAuth} = useAuth();
+    const { auth, mutateAuth } = useAuth();
     const router = useRouter();
 
     const handleLogout = async (e) => {
         e.preventDefault();
-        console.log("LOGOUT");
 
-        await AuthAPI.Logout();
+        await AuthAPI.Logout(),
+        mutateAuth(null, {revalidate: true, refreshInterval: 0});
 
-        cookieDeleteSesssion(document);
-        mutateAuth(null);
         router.push("/");
-
     };
 
     return (
@@ -32,7 +28,7 @@ export default function Header() {
                 </Link>
             </div>
 
-            {!auth && (
+            {auth?.status == "error" && (
                 <div className="menu button">
                     <Link href="/login">
                         <a>Login</a>
@@ -43,7 +39,7 @@ export default function Header() {
                 </div>
             )}
 
-            {auth && (
+            {auth?.status == "successful" && (
                 <div className="menu button">
                     <Link href="/jobs">
                         <a>Jobs</a>

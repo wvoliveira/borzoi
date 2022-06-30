@@ -7,15 +7,17 @@ export default async function fetchJson(input, init) {
 
   // response.ok is true when res.status is 2xx
   // https://developer.mozilla.org/en-US/docs/Web/API/Response/ok
-  if (response.ok) {
-    return data;
-  }
+  // if (response.ok) {
+  //   return data;
+  // }
 
-  throw new FetchError({
-    message: response.statusText,
-    response,
-    data,
-  });
+  return data;
+
+  // throw new FetchError({
+  //   message: response.statusText,
+  //   response,
+  //   data,
+  // });
 }
 
 export class FetchError extends Error {
