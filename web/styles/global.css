@@ -1,3 +1,11 @@
+:root {
+  --yellow: #fca311;
+  --gray: #e5e5e5;
+  --white: #ffffff;
+  --black: #000000;
+  --blue: #14213d;
+}
+
 * {
   padding: 5px;
 }
@@ -30,8 +38,8 @@ header {
   padding-right: 20px;
 }
 
-.logo>a:hover {
-  color: #fca311;
+.logo a:hover {
+  color: var(--yellow);
 }
 
 a {
@@ -55,30 +63,12 @@ body, input, button {
 }
 
 .menu.button a {
-  /* padding-left: 15px;
-  padding-right: 15px; */
-  margin-left: 10px;
-  margin-right: 10px;
-  /* padding-top: 15px;
-  padding-bottom: 10px; */
-}
-
-.menu.button>a {
-  color: black;
+  padding: 5px 10px 5px 10px;
   display: inline-block;
-  margin: 0;
 }
 
-.menu.button>a:after {
-  display: block;
-  content: '';
-  border-bottom: solid 3px black;  
-  transform: scaleX(0);  
-  transition: transform .2s ease-in-out;
-}
-
-.menu.button>a:hover:after {
-  transform: scaleX(1);
+.menu.button a:hover {
+  background-color: var(--gray);
 }
 
 input, button {

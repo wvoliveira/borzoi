@@ -1,17 +1,27 @@
 import * as React from "react";
+import { useEffect } from "react";
+
 import { useRouter } from "next/router";
 import Link from "next/link";
 
 import useAuth from "../lib/utils/useAuth";
 import { AuthAPI } from "../lib/api/auth";
+import { cookieDeleteSesssion } from "../lib/utils/cookie";
 
 export default function Header() {
-    const { auth, mutateAuth } = useAuth();
+    const {auth, mutateAuth} = useAuth();
     const router = useRouter();
 
-    const handleLogout = (e) => {
+    const handleLogout = async (e) => {
         e.preventDefault();
-        AuthAPI.Logout().then(mutateAuth(null) && router.push("/"));
+        console.log("LOGOUT");
+
+        await AuthAPI.Logout();
+
+        cookieDeleteSesssion(document);
+        mutateAuth(null);
+        router.push("/");
+
     };
 
     return (
@@ -25,10 +35,10 @@ export default function Header() {
             {!auth && (
                 <div className="menu button">
                     <Link href="/login">
-                        <a>login</a>
+                        <a>Login</a>
                     </Link>
                     <Link href="/register">
-                        <a>register</a>
+                        <a>Register</a>
                     </Link>
                 </div>
             )}
@@ -36,16 +46,16 @@ export default function Header() {
             {auth && (
                 <div className="menu button">
                     <Link href="/jobs">
-                        <a>jobs</a>
+                        <a>Jobs</a>
                     </Link>
                     <Link href="/clients">
-                        <a>clients</a>
+                        <a>Clients</a>
                     </Link>
                     <Link href="/profile">
-                        <a>profile</a>
+                        <a>Profile</a>
                     </Link>
-                    <Link href="/logout" onClick={handleLogout}>
-                        <a>logout</a>
+                    <Link href="">
+                        <a onClick={handleLogout}>Logout</a>
                     </Link>
                 </div>
             )}

@@ -1,16 +1,17 @@
 import React from "react";
+import { useRouter } from "next/router";
 
 import { AuthAPI } from "../lib/api/auth";
 import useAuth from "../lib/utils/useAuth";
-import { TextField, Typography } from "@mui/material";
-import { LoadingButton } from "@mui/lab";
 import Link from "next/link";
 
 export default function FormLogin() {
-    const { mutateAuth } = useAuth({
+    const { auth, mutateAuth } = useAuth({
         redirectTo: "/",
         redirectIfFound: true,
     });
+
+    const router = useRouter();
 
     const [loading, setLoading] = React.useState(false);
     const [error, setError] = React.useState("");
@@ -38,7 +39,8 @@ export default function FormLogin() {
             }
 
             if (status === 200) {
-                mutateAuth(true);
+                mutateAuth(null);
+                router.push("/");
             }
         } catch (error) {
             console.error(error);
@@ -73,7 +75,7 @@ export default function FormLogin() {
                 type="submit"
                 onClick={handleSubmit}
                 variant="contained"
-                loading={loading}
+                loading={loading ? "true" : "false"}
             >
                 Login
             </button>{" "}
