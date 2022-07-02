@@ -1,11 +1,13 @@
 import axios from "axios";
+import React, {useEffect} from "react";
+import useSWR from "swr";
+import Router from "next/router";
 
-
-export const ClientAPI = {
+export const JobsAPI = {
     Create: async(name, description) => {
         try {
             return await axios.post(
-                '/api/v1/clients',
+                '/api/v1/jobs',
                 JSON.stringify({"name": name, "description": description}), {
                     headers: {
                         "Accept": "application/json",
@@ -26,7 +28,7 @@ export const ClientAPI = {
         page +=1;
 
         try {
-            return await axios.get(`/api/v1/clients?page=${page}&limit=${limit}`)
+            return await axios.get(`/api/v1/jobs?page=${page}&limit=${limit}`)
         } catch (error) {
             return error.response;
         }

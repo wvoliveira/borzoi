@@ -1,6 +1,4 @@
 import * as React from 'react';
-import { SWRConfig } from "swr";
-import fetchJson from "../lib/utils/fetchJson";
 
 import '../styles/normalize.css'
 import '../styles/global.css'

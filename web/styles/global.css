@@ -1,5 +1,6 @@
 :root {
   --yellow: #fca311;
+  --yellow-weak: #ffe134c2;
   --gray: #e5e5e5;
   --white: #ffffff;
   --black: #000000;
@@ -72,7 +73,17 @@ body, input, button {
 }
 
 input, button {
-  border: 1px solid #797979;
+  border: 2px solid black;
+  margin-right: 5px;
+}
+
+input:focus {
+  border: 2px solid var(--yellow);
+  outline: none;
+}
+
+input:valid {
+  background-color: var(--gray);
 }
 
 button {
@@ -80,6 +91,40 @@ button {
   font-style: normal;
   padding-left: 6px;
   padding-right: 6px;
+}
+
+button:active {
+  border: 2px solid var(--yellow);
+  outline: none;
+}
+
+/* Table */
+
+table {
+  border-collapse: collapse;
+  border: 1px solid var(--black);
+  padding: 10px 15px;
+  text-align: left;
+}
+
+th {
+  border: 1px solid var(--gray);
+  padding: 10px 20px 10px 10px;
+
+  font-family: 'Open Sans';
+  font-size: 17px;
+  font-weight: bold;
+
+  background-color: var(--gray);
+}
+
+td {
+  border: 1px solid var(--gray);
+  padding: 10px 10px;
+}
+
+tr:hover {
+  background-color: var(--yellow-weak);
 }
 
 /* smartphones, iPhone, portrait 480x320 phones */

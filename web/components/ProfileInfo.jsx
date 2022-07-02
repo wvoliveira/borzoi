@@ -1,11 +1,12 @@
-import {Typography} from "@mui/material";
-import useUser from "../lib/utils/useUser";
-    import EmailIcon from '@mui/icons-material/Email';
+import useUser from "../lib/hooks/useUser";
+
 
 export default function ProfileInfo() {
     const { user } = useUser({
         redirectTo: "/login",
     });
+
+    console.log(user);
 
     if (!user) {
         return (

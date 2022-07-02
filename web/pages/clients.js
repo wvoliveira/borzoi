@@ -1,16 +1,11 @@
 
 import * as React from "react";
-import FormCreateClient from "../components/clients/FormCreateClient";
-import TableClients from "../components/clients/TableClients";
-import useAuth from "../lib/utils/useAuth";
-import { useRouter } from "next/router";
+import ClientTable from "../components/ClientTable";
+
 
 export default function Clients() {
-    const router = useRouter();
-    const { auth } = useAuth({ redirectTo: "/" });
-
     return (<>
-        <FormCreateClient />
-        <TableClients />
+        <h2>Clients</h2>
+        <ClientTable />
     </>);
 }

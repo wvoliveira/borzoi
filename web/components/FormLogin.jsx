@@ -2,8 +2,9 @@ import React from "react";
 import { useRouter } from "next/router";
 
 import { AuthAPI } from "../lib/api/auth";
-import useAuth from "../lib/utils/useAuth";
+import useAuth from "../lib/hooks/useAuth";
 import Link from "next/link";
+
 
 export default function FormLogin() {
     const { auth, mutateAuth } = useAuth({

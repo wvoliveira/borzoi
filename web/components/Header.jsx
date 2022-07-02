@@ -3,7 +3,7 @@ import * as React from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 
-import useAuth from "../lib/utils/useAuth";
+import useAuth from "../lib/hooks/useAuth";
 import { AuthAPI } from "../lib/api/auth";
 
 
@@ -50,7 +50,7 @@ export default function Header() {
                     <Link href="/profile">
                         <a>Profile</a>
                     </Link>
-                    <Link href="">
+                    <Link href="/">
                         <a onClick={handleLogout}>Logout</a>
                     </Link>
                 </div>
