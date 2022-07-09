@@ -3,10 +3,14 @@ import * as React from "react";
 import JobsTable from "../components/JobsTable";
 
 export default function Jobs() {
+    useAuth({
+        redirectTo: "/login",
+    });
 
-    return (<>
-        <h2>Jobs</h2>
-        <JobsTable />
+    return (
+        <>
+            <h2>Jobs</h2>
+            <JobsTable />
         </>
     );
 }
