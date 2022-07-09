@@ -5,6 +5,7 @@
     --white: #ffffff;
     --black: #000000;
     --blue: #14213d;
+    --red: #fe5555;
 }
 
 * {
@@ -67,9 +68,42 @@ a {
     background-color: var(--gray);
 }
 
+/* Form */
+
+form {
+    padding: 0px;
+    width: 400px;
+    height: auto;
+}
+
+form > input,
+form > textarea,
+form > button {
+    display: block;
+}
+
+form > input {
+    padding: 8px;
+    margin: 5px 5px 5px 0px;
+    width: 380px; /* TODO: fix this width */
+}
+
+form > textarea {
+    width: 380px; /* TODO: fix this width */
+}
+
+form > button {
+    margin: 0;
+    margin-left: auto;
+    margin-right: 0;
+}
+
+/* Input */
+
 input {
     border: 2px solid black;
     margin-right: 5px;
+    background-color: transparent;
 }
 
 input:focus {
@@ -77,8 +111,24 @@ input:focus {
     outline: none;
 }
 
-input:valid {
-    background-color: var(--gray);
+input:invalid {
+    border-color: var(--red);
+}
+
+/* Text Area */
+
+textarea {
+    border: 2px solid black;
+    padding: 8px;
+    margin: 5px 5px 5px 0px;
+    background-color: transparent;
+    height: 80px;
+    resize: none;
+}
+
+textarea:focus {
+    border: 2px solid var(--yellow);
+    outline: none;
 }
 
 /* Links */
@@ -95,7 +145,6 @@ button {
 }
 
 button {
-    font-weight: bold;
     font-style: normal;
     padding-left: 6px;
     padding-right: 6px;
