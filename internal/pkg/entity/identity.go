@@ -15,7 +15,7 @@ type Identity struct {
 	Password string `json:"password,omitempty"`
 
 	// Relationship with User model.
-	UserID string `json:"-"`
+	UserID string `json:"user_id"`
 
 	Verified   *bool      `json:"verified" gorm:"default:false"`
 	VerifiedAt *time.Time `json:"verified_at"`
