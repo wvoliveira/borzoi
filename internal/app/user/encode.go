@@ -1,28 +1,42 @@
 package user
 
 import (
-	"net/http"
-
+	"encoding/json"
 	"github.com/elga-io/borzoi/internal/pkg/entity"
-	"github.com/elga-io/borzoi/internal/pkg/response"
+	res "github.com/elga-io/borzoi/internal/pkg/response"
+	"net/http"
 )
 
-// GET /v1/user/<id>
-func encodeFindByID(w http.ResponseWriter, user entity.User) {
-	response.Default(w, user, "", http.StatusOK)
+func encodeFindByID(w http.ResponseWriter, user entity.User) (err error) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(res.Response{
+		Status:  "successful",
+		Data:    user,
+		Message: "",
+	})
+	return
 }
 
-// PATCH /v1/users/<id>
-func encodeUpdate(w http.ResponseWriter, user entity.User) {
-	response.Default(w, nil, "", http.StatusOK)
+func encodeUpdate(w http.ResponseWriter, link entity.User) (err error) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(res.Response{
+		Status:  "successful",
+		Data:    link,
+		Message: "",
+	})
+	return
 }
 
 // GET /v1/users/me
-func encodeFindMe(w http.ResponseWriter, user entity.User) {
-	response.Default(w, user, "", http.StatusOK)
-}
-
-// PATCH /v1/users/me
-func encodeUpdateMe(w http.ResponseWriter) {
-	response.Default(w, nil, "", http.StatusOK)
+func encodeFindMe(w http.ResponseWriter, user entity.User) (err error) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(res.Response{
+		Status:  "successful",
+		Data:    user,
+		Message: "",
+	})
+	return
 }
