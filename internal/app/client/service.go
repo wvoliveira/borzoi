@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/dgraph-io/badger/v3"
+	"github.com/elga-io/borzoi/internal/pkg/config"
 	"github.com/elga-io/borzoi/internal/pkg/entity"
 	e "github.com/elga-io/borzoi/internal/pkg/errors"
 	"github.com/elga-io/borzoi/internal/pkg/session"
@@ -29,13 +30,14 @@ type Service interface {
 }
 
 type service struct {
+	cfg   config.Config
 	db    *gorm.DB
 	cache *badger.DB
 }
 
 // NewService creates a new authentication service.
-func NewService(db *gorm.DB, cache *badger.DB) Service {
-	return service{db, cache}
+func NewService(cfg config.Config, db *gorm.DB, cache *badger.DB) Service {
+	return service{cfg, db, cache}
 }
 
 // FindAll get a list of clients.
@@ -48,8 +50,13 @@ func (s service) FindAll(ctx context.Context, search string, page, limit int) (c
 		offset = (page * limit) - limit
 	}
 
-	query := s.db.Model(&entity.Client{}).
-		Debug().
+	query := s.db.Model(&entity.Client{})
+
+	if s.cfg.Debug {
+		query = query.Debug()
+	}
+
+	query = query.
 		Offset(offset).
 		Limit(limit)
 
@@ -64,7 +71,7 @@ func (s service) FindAll(ctx context.Context, search string, page, limit int) (c
 		Limit(-1).
 		Count(&total).Error
 
-	fmt.Printf("TOTAL: %v\n", total)
+	l.Debug().Caller().Msgf("total: %v", total)
 
 	if int(total) <= limit {
 		pages = 1
@@ -73,7 +80,6 @@ func (s service) FindAll(ctx context.Context, search string, page, limit int) (c
 	}
 
 	if len(clients) == 0 {
-		l.Warn().Caller().Msg(fmt.Sprintf("clients with search=%s limit=%d offset=%d was not found", search, limit, offset))
 		return clients, pages, total, nil
 	}
 	if err != nil {

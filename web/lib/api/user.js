@@ -1,9 +1,8 @@
 import axios from "axios";
 
-const fetcher = (...args) => fetch(...args).then((res) => res.json())
 
 export const UserAPI = {
-    Me: async() => {
+    Me: async () => {
         try {
             const response = await axios.get(
                 '/api/v1/users/me', {

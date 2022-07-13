@@ -236,6 +236,11 @@
   "resolved" "https://registry.npmjs.org/@fontsource/abel/-/abel-4.5.4.tgz"
   "version" "4.5.4"
 
+"@fontsource/bebas-neue@^4.5.7":
+  "integrity" "sha512-wVPVtSxQD3BVYs9F2ENBq9Qx2PZW0X9GOMhtbny+kKQAAaKWrFv29r8swJ6uNuXM+f+CcNmjb3P/aWC7tPaR+w=="
+  "resolved" "https://registry.npmjs.org/@fontsource/bebas-neue/-/bebas-neue-4.5.7.tgz"
+  "version" "4.5.7"
+
 "@fontsource/inter@^4.5.7":
   "integrity" "sha512-25k3thupaOEBexuU+jAkGqieKPbuhSuA+sinDwp1iBNhqQPiJ9QHDvsXgoCgCbZ4sGlE8aCwZmSlDJrPdJHNkw=="
   "resolved" "https://registry.npmjs.org/@fontsource/inter/-/inter-4.5.7.tgz"
@@ -246,10 +251,10 @@
   "resolved" "https://registry.npmjs.org/@fontsource/lato/-/lato-4.5.5.tgz"
   "version" "4.5.5"
 
-"@fontsource/open-sans@^4.5.8":
-  "integrity" "sha512-3b94XDdRLqL7OlE7OjWg/4pgG825Juw8PLVEDm6h5pio0gMU89ICxfatGxHsBxMGfqad+wnvdmUweZWlELDFpQ=="
-  "resolved" "https://registry.npmjs.org/@fontsource/open-sans/-/open-sans-4.5.8.tgz"
-  "version" "4.5.8"
+"@fontsource/open-sans@^4.5.10":
+  "integrity" "sha512-MrtTDfWb1Tu9YxVh2KaKmsKBn6O3KL/lHZS0KRKK58jgqvdwuiDt4QW4udmW4FQf0XOWgnZ+4vKUF80F3SqBAA=="
+  "resolved" "https://registry.npmjs.org/@fontsource/open-sans/-/open-sans-4.5.10.tgz"
+  "version" "4.5.10"
 
 "@fontsource/roboto@^4.5.3":
   "integrity" "sha512-NUvBTj332dFRdiVkLlavXbDGoD2zyyeGYmMyrXOnctg/3e4pq95+rJgNfUP+k4v8UBk2L1aomGw9dDjbRdAmTg=="
@@ -414,14 +419,9 @@
   "resolved" "https://registry.npmjs.org/@next/env/-/env-12.1.0.tgz"
   "version" "12.1.0"
 
-"@next/swc-linux-x64-gnu@12.1.0":
-  "integrity" "sha512-OKO4R/digvrVuweSw/uBM4nSdyzsBV5EwkUeeG4KVpkIZEe64ZwRpnFB65bC6hGwxIBnTv5NMSnJ+0K/WmG78A=="
-  "resolved" "https://registry.npmjs.org/@next/swc-linux-x64-gnu/-/swc-linux-x64-gnu-12.1.0.tgz"
-  "version" "12.1.0"
-
-"@next/swc-linux-x64-musl@12.1.0":
-  "integrity" "sha512-JohhgAHZvOD3rQY7tlp7NlmvtvYHBYgY0x5ZCecUT6eCCcl9lv6iV3nfu82ErkxNk1H893fqH0FUpznZ/H3pSw=="
-  "resolved" "https://registry.npmjs.org/@next/swc-linux-x64-musl/-/swc-linux-x64-musl-12.1.0.tgz"
+"@next/swc-darwin-x64@12.1.0":
+  "integrity" "sha512-ieAz0/J0PhmbZBB8+EA/JGdhRHBogF8BWaeqR7hwveb6SYEIJaDNQy0I+ZN8gF8hLj63bEDxJAs/cEhdnTq+ug=="
+  "resolved" "https://registry.npmjs.org/@next/swc-darwin-x64/-/swc-darwin-x64-12.1.0.tgz"
   "version" "12.1.0"
 
 "@panva/hkdf@^1.0.1":

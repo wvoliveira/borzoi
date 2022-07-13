@@ -1,16 +1,19 @@
-import Layout from "../components/Layout";
-import {Link} from "@mui/material";
-import Typography from "@mui/material/Typography";
 import * as React from "react";
-import FormCreateClient from "../components/clients/FormCreateClient";
-import TableClients from "../components/clients/TableClients";
 
-export default function Clients() {
+import JobsTable from "../components/JobsTable";
+
+import useAuth from "../lib/hooks/useAuth";
+
+
+export default function Jobs() {
+    useAuth({
+        redirectTo: "/login",
+    });
+
     return (
-        <Layout>
-            <Typography>
-                Jobs
-            </Typography>
-        </Layout>
+        <>
+            <h2>Jobs</h2>
+            <JobsTable />
+        </>
     );
 }

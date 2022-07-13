@@ -3,8 +3,6 @@ package main
 import (
 	"context"
 	"embed"
-	"errors"
-	"flag"
 	"fmt"
 	"io/fs"
 	"net/http"
@@ -19,6 +17,7 @@ import (
 	"github.com/elga-io/borzoi/internal/app/auth/password"
 	"github.com/elga-io/borzoi/internal/app/client"
 	"github.com/elga-io/borzoi/internal/app/user"
+	"github.com/elga-io/borzoi/internal/pkg/common"
 	"github.com/elga-io/borzoi/internal/pkg/config"
 	"github.com/elga-io/borzoi/internal/pkg/database"
 	"github.com/elga-io/borzoi/internal/pkg/entity"
@@ -30,16 +29,17 @@ import (
 
 //const version = "0.0.0"
 
-//go:embed web
-//go:embed web/_next/static
-//go:embed web/_next/static/chunks/pages/*.js
-//go:embed web/_next/static/*/*.js
+//go:embed all:web
 var nextFS embed.FS
 
 func main() {
+<<<<<<< HEAD
 	migrate := flag.Bool("migrate", false, "Enable GORM migration")
 	debug := flag.Bool("debug", false, "Sets log level to debug")
 	flag.Parse()
+=======
+	zerolog.SetGlobalLevel(zerolog.InfoLevel)
+>>>>>>> main
 
 	// Starts and configure logger.
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
@@ -51,6 +51,11 @@ func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	log.Info().Msg("Initializing app...")
 
+	cfg := config.NewConfig()
+	if cfg.Debug {
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	}
+
 	// Create context that listens for the interrupt signal from the OS.
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
@@ -61,16 +66,19 @@ func main() {
 	}
 
 	// Create database and cache folder in $HOME/.borzoi path.
-	folder, err := createDataFolder(".borzoi")
+	folder, err := common.CreateDataFolder(".borzoi")
 	if err != nil {
 		panic(err)
 	}
 
-	cfg := config.NewConfig()
-	db := database.NewSQLDatabase("sqlite", filepath.Join(folder, "data"))
-	cache := database.NewNoSQLDatabase("badger", filepath.Join(folder, "cache"))
+	db := database.NewSQLDatabase(cfg.SQLType, filepath.Join(folder, "data"))
+	cache := database.NewNoSQLDatabase(cfg.NoSQLType, filepath.Join(folder, "cache"))
 
+<<<<<<< HEAD
 	if *migrate {
+=======
+	if cfg.Migrate {
+>>>>>>> main
 		err = db.AutoMigrate(
 			entity.Identity{},
 			entity.User{},
@@ -110,7 +118,7 @@ func main() {
 	userService.HTTPNew(apiRouter)
 
 	// Clients service.
-	clientService := client.NewService(db, cache)
+	clientService := client.NewService(cfg, db, cache)
 	clientService.HTTPNew(apiRouter)
 
 	// Addresses service.
@@ -122,7 +130,9 @@ func main() {
 	webRouter.PathPrefix("").Handler(webHandler)
 
 	// Print routes when startup app.
-	printRoutes([]*mux.Router{webRouter, apiRouter})
+	if cfg.LogRoutes {
+		common.PrintRoutes([]*mux.Router{webRouter, apiRouter})
+	}
 
 	srv := &http.Server{
 		Addr:         ":" + cfg.HTTPPort,
@@ -155,46 +165,4 @@ func main() {
 		log.Error().Msg(fmt.Sprintf("server forced to shutdown: %s", err.Error()))
 	}
 	log.Info().Msg("server exiting")
-}
-
-func createDataFolder(name string) (folder string, err error) {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return
-	}
-
-	folder = filepath.Join(home, name)
-	if _, err = os.Stat(folder); os.IsNotExist(err) {
-		err = os.Mkdir(folder, os.ModePerm)
-		if err != nil {
-			return
-		}
-	} else if err != nil {
-		return
-	}
-	return
-}
-
-func printRoutes(rs []*mux.Router) {
-	for _, r := range rs {
-		_ = r.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
-			uri, err := route.GetPathTemplate()
-			if err != nil {
-				log.Error().Msg(fmt.Sprintf("with get path template: %s", err.Error()))
-				return err
-			}
-
-			method, err := route.GetMethods()
-			if err != nil {
-				if errors.Is(err, mux.ErrMethodMismatch) {
-					return err
-				}
-			}
-
-			if uri != "" && len(method) != 0 {
-				log.Info().Msg(fmt.Sprintf("%s %s", uri, method))
-			}
-			return nil
-		})
-	}
 }

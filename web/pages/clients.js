@@ -1,21 +1,16 @@
-import Layout from "../components/Layout";
-import {Link} from "@mui/material";
-import Typography from "@mui/material/Typography";
 import * as React from "react";
-import FormCreateClient from "../components/clients/FormCreateClient";
-import TableClients from "../components/clients/TableClients";
-import useAuth from "../lib/utils/useAuth";
-import {useRouter} from "next/router";
+import ClientTable from "../components/ClientTable";
+import ClientSection from "../components/ClientSection";
+
+import useAuth from "../lib/hooks/useAuth";
+
 
 export default function Clients() {
-    const router = useRouter();
-    const {auth} = useAuth({redirectTo: "/"});
+    useAuth({
+        redirectTo: "/login",
+    });
 
-    return (
-        <Layout>
-            <FormCreateClient />
-            <br/>
-            <TableClients />
-        </Layout>
-    );
+    return (<>
+        <ClientSection />
+    </>);
 }

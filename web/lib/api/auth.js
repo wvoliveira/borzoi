@@ -2,6 +2,20 @@ import axios from "axios";
 import React from "react";
 
 export const AuthAPI = {
+    Check: async() => {
+        try {
+            return await axios.get(
+                '/api/auth/check', {
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+        } catch (error) {
+            return error.response;
+        }
+    },
     Login: async(email, password) => {
         try {
             return await axios.post(
