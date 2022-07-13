@@ -5,15 +5,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net/http"
-	"time"
-
 	"github.com/dgraph-io/badger/v3"
 	e "github.com/elga-io/borzoi/internal/pkg/errors"
 	"github.com/elga-io/borzoi/internal/pkg/session"
+	"github.com/google/uuid"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	"github.com/segmentio/ksuid"
+	"net/http"
+	"time"
 )
 
 type LogResponseWriter struct {
@@ -88,7 +87,7 @@ func (m Middleware) CorrelationID(next http.Handler) http.Handler {
 		ctx := r.Context()
 		id := r.Header.Get("X-Correlation-Id")
 		if id == "" {
-			id = ksuid.New().String()
+			id = uuid.New().String()
 		}
 
 		ctx = context.WithValue(ctx, "correlation_id", id)
@@ -111,17 +110,21 @@ func (m Middleware) Log(next http.Handler) http.Handler {
 		logRespWriter := NewLogResponseWriter(w)
 
 		l := log.Ctx(r.Context())
-
-		next.ServeHTTP(logRespWriter, r)
-
 		l.
 			Info().
 			Caller().
 			Str("remote_addr", r.RemoteAddr).
 			Str("method", r.Method).
 			Str("path", r.URL.Path).
+			Msg("request")
+
+		next.ServeHTTP(logRespWriter, r)
+
+		l.
+			Info().
+			Caller().
 			Str("duration", time.Since(startTime).String()).
 			Int("status", logRespWriter.statusCode).
-			Msg("http")
+			Msg("response")
 	})
 }

@@ -1,13 +1,12 @@
 package user
 
 import (
-	"net/http"
-
 	"github.com/elga-io/borzoi/internal/pkg/entity"
 	e "github.com/elga-io/borzoi/internal/pkg/errors"
 	m "github.com/elga-io/borzoi/internal/pkg/middleware"
 	res "github.com/elga-io/borzoi/internal/pkg/response"
 	"github.com/gorilla/mux"
+	"net/http"
 )
 
 func (s service) HTTPNew(r *mux.Router) {
@@ -23,6 +22,7 @@ func (s service) HTTPNew(r *mux.Router) {
 
 func (s service) HTTPFindAll(w http.ResponseWriter, r *http.Request) {
 	res.NotImplemented(w)
+	return
 }
 
 func (s service) HTTPFindByID(w http.ResponseWriter, r *http.Request) {
@@ -38,7 +38,12 @@ func (s service) HTTPFindByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	encodeFindByID(w, user)
+	err = encodeFindByID(w, user)
+	if err != nil {
+		e.EncodeError(w, err)
+		return
+	}
+	return
 }
 
 func (s service) HTTPUpdate(w http.ResponseWriter, r *http.Request) {
@@ -54,7 +59,12 @@ func (s service) HTTPUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	encodeUpdate(w, l)
+	err = encodeUpdate(w, l)
+	if err != nil {
+		e.EncodeError(w, err)
+		return
+	}
+	return
 }
 
 func (s service) HTTPFindMe(w http.ResponseWriter, r *http.Request) {
@@ -70,21 +80,15 @@ func (s service) HTTPFindMe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	encodeFindMe(w, user)
+	err = encodeFindMe(w, user)
+	if err != nil {
+		e.EncodeError(w, err)
+		return
+	}
+	return
 }
 
 func (s service) HTTPUpdateMe(w http.ResponseWriter, r *http.Request) {
-	req, err := decodeUpdateMe(r)
-	if err != nil {
-		e.EncodeError(w, err)
-		return
-	}
-
-	err = s.UpdateMe(r.Context(), req.ID, entity.User{Name: req.Name})
-	if err != nil {
-		e.EncodeError(w, err)
-		return
-	}
-
-	encodeUpdateMe(w)
+	res.NotImplemented(w)
+	return
 }

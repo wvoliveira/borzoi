@@ -4,14 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net/http"
-
 	"github.com/dgraph-io/badger/v3"
 	"github.com/elga-io/borzoi/internal/pkg/entity"
 	e "github.com/elga-io/borzoi/internal/pkg/errors"
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
+	"net/http"
 )
 
 // Service encapsulates the link service logic, http handlers and another transport layer.
@@ -73,7 +72,7 @@ func (s service) Update(ctx context.Context, id string, payload entity.User) (us
 	return
 }
 
-// FindMe get user profile from userID.
+// FindMe get a shortener link from id.
 func (s service) FindMe(ctx context.Context, userID string) (user entity.User, err error) {
 	l := log.Ctx(ctx)
 
@@ -94,23 +93,6 @@ func (s service) FindMe(ctx context.Context, userID string) (user entity.User, e
 	for _, identity := range userDB.Identities {
 		identity.Password = ""
 		user.Identities = append(user.Identities, identity)
-	}
-	return
-}
-
-// UpdateMe change self-user by ID.
-func (s service) UpdateMe(ctx context.Context, id string, payload entity.User) (err error) {
-	l := log.Ctx(ctx)
-
-	err = s.db.Model(&entity.User{}).Where("id = ?", id).Updates(&payload).Error
-	if err == gorm.ErrRecordNotFound {
-		l.Warn().Caller().Msg(fmt.Sprintf("the user with id '%s' was not found", id))
-		return e.ErrUserNotFound
-	}
-
-	if err != nil {
-		l.Error().Caller().Msg(err.Error())
-		return
 	}
 	return
 }
