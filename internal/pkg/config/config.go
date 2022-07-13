@@ -18,6 +18,6 @@ func NewConfig() (c Config) {
 	c.HTTPPort = "8080"
 	c.LogRoutes = true
 	c.Migrate = true
-	c.Debug = true
+	c.Debug = false
 	return
 }

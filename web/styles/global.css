@@ -13,8 +13,8 @@
 }
 
 body > * {
-    font-family: 'Roboto Light', 'Roboto Medium', 'Roboto';
-    font-weight: 300;
+    font-family: 'Roboto';
+    font-weight: 400;
 }
 
 .all {
