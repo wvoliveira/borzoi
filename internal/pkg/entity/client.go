@@ -1,9 +1,10 @@
 package entity
 
 import (
-	"github.com/google/uuid"
-	"gorm.io/gorm"
 	"time"
+
+	"github.com/segmentio/ksuid"
+	"gorm.io/gorm"
 )
 
 // Client represents a user info.
@@ -27,7 +28,7 @@ type Client struct {
 }
 
 func (c *Client) BeforeCreate(_ *gorm.DB) (err error) {
-	c.ID = uuid.New().String()
+	c.ID = ksuid.New().String()
 	return
 }
 
@@ -45,7 +46,7 @@ type Phone struct {
 }
 
 func (p *Phone) BeforeCreate(_ *gorm.DB) (err error) {
-	p.ID = uuid.New().String()
+	p.ID = ksuid.New().String()
 	return
 }
 
@@ -63,7 +64,7 @@ type Email struct {
 }
 
 func (e *Email) BeforeCreate(_ *gorm.DB) (err error) {
-	e.ID = uuid.New().String()
+	e.ID = ksuid.New().String()
 	return
 }
 
@@ -80,6 +81,6 @@ type Note struct {
 }
 
 func (n *Note) BeforeCreate(_ *gorm.DB) (err error) {
-	n.ID = uuid.New().String()
+	n.ID = ksuid.New().String()
 	return
 }

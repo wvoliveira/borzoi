@@ -3,12 +3,13 @@ package user
 import (
 	"encoding/json"
 	"errors"
+	"io/ioutil"
+	"net/http"
+
 	e "github.com/elga-io/borzoi/internal/pkg/errors"
 	"github.com/elga-io/borzoi/internal/pkg/session"
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog/log"
-	"io/ioutil"
-	"net/http"
 )
 
 type findByIDRequest struct {
@@ -16,6 +17,11 @@ type findByIDRequest struct {
 }
 
 type updateRequest struct {
+	ID   string `json:"-"`
+	Name string `json:"name"`
+}
+
+type updateMeRequest struct {
 	ID   string `json:"-"`
 	Name string `json:"name"`
 }
@@ -63,6 +69,34 @@ func decodeFindMe(r *http.Request) (userID string, err error) {
 	if userID == "" {
 		l.Warn().Caller().Msg("user ID not found from session cookie")
 		return userID, e.ErrUserNotFound
+	}
+	return
+}
+
+// PATCH /v1/users/me
+func decodeUpdateMe(r *http.Request) (req updateMeRequest, err error) {
+	l := log.Ctx(r.Context())
+	userID := session.UserGetIDFromContext(r.Context())
+
+	if userID == "" {
+		l.Warn().Caller().Msg("user ID not found from session cookie")
+		return req, e.ErrUserNotFound
+	}
+
+	req.ID = userID
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		if err.Error() == "EOF" {
+			return req, errors.New("you need send a body/payload for update user information")
+		}
+		if err != nil {
+			return
+		}
+	}
+	err = json.Unmarshal(body, &req)
+	if err != nil {
+		return
 	}
 	return
 }

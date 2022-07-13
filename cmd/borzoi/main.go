@@ -33,7 +33,20 @@ import (
 var nextFS embed.FS
 
 func main() {
+<<<<<<< HEAD
+	migrate := flag.Bool("migrate", false, "Enable GORM migration")
+	debug := flag.Bool("debug", false, "Sets log level to debug")
+	flag.Parse()
+=======
 	zerolog.SetGlobalLevel(zerolog.InfoLevel)
+>>>>>>> main
+
+	// Starts and configure logger.
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	if *debug {
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	}
 
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	log.Info().Msg("Initializing app...")
@@ -61,7 +74,11 @@ func main() {
 	db := database.NewSQLDatabase(cfg.SQLType, filepath.Join(folder, "data"))
 	cache := database.NewNoSQLDatabase(cfg.NoSQLType, filepath.Join(folder, "cache"))
 
+<<<<<<< HEAD
+	if *migrate {
+=======
 	if cfg.Migrate {
+>>>>>>> main
 		err = db.AutoMigrate(
 			entity.Identity{},
 			entity.User{},

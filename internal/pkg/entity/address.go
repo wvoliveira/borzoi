@@ -1,9 +1,10 @@
 package entity
 
 import (
-	"github.com/google/uuid"
-	"gorm.io/gorm"
 	"time"
+
+	"github.com/segmentio/ksuid"
+	"gorm.io/gorm"
 )
 
 // Address an address for client or any entity.
@@ -29,6 +30,6 @@ type Address struct {
 }
 
 func (n *Address) BeforeCreate(_ *gorm.DB) (err error) {
-	n.ID = uuid.New().String()
+	n.ID = ksuid.New().String()
 	return
 }
