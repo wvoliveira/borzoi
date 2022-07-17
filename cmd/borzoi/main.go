@@ -78,10 +78,18 @@ func main() {
 
 	router := mux.NewRouter().SkipClean(true)
 	router.Use(mw.CorrelationID)
-	router.Use(mw.Log)
 
 	apiRouter := router.PathPrefix("/api").Subrouter().StrictSlash(true)
 	webRouter := router.PathPrefix("/").Subrouter().StrictSlash(true)
+
+	// Log for web path is so verbose
+	// So we need active only for debug purpose
+	// or use some cache or whatever like that.
+	if cfg.Debug {
+		router.Use(mw.Log)
+	} else {
+		apiRouter.Use(mw.Log)
+	}
 
 	// Start services.
 	// Each service can separated per mini-service.

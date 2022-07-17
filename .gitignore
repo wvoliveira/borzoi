@@ -26,3 +26,6 @@
 # IDE, editors, etc
 .vscode/
 .idea/
+
+!cmd/borzoi/web/favicon.ico
+web/package-lock.json
