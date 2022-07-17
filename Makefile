@@ -22,7 +22,12 @@ build-web:
 
 .PHONY: clean
 clean:
-	rm -f spitz
+	rm -f borzoi
 	rm -rf ./cmd/borzoi/web
 	rm -rf ./web/dist
 	rm -rf ./web/.next
+
+.PHONY: docker
+docker:
+	docker build -t borzoi:local . && \
+	docker run --rm -p 80:8080 borzoi:local
